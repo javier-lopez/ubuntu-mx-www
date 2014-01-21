@@ -12,10 +12,13 @@ If you are interested in deploying this site (which may be the case if you are t
 
 Note: The deployment has been optimized to work on Ubuntu 12.04 servers
 
-1. Run:
+
+1. Ensure you've root permitions through sudo
+
+2. Run (an answer the root question):
 
    ```
-   $ step 1
+   $ sh <(wget -qO- github-url/ubuntu-mx-www/deploy)
    ```
 
 2. Configure the ...:
