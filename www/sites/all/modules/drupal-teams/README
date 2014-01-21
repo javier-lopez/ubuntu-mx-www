@@ -1,0 +1,17 @@
+$Id$
+
+Launchpad teams extension module for Drupal 5.x
+
+This module allows you to request team membership data from a participating
+OpenID server and assign drupal roles based on the response.  Initially,
+launchpad.net is the only known implementing provider. Users can use launchpad
+as their OpenID server by using 'https://login.launchpad.net/' as their OpenID.
+To accompany this teams module, we have released a module which provides closer
+integration with launchpad as an OpenID/single sign-on provider.
+
+[IMPORTANT] Assigning roles from teams
+
+When selecting roles to be assigned based on team membership at login, it is
+recommended that you create roles specifically for this purpose.  This is
+because the module assigns these roles automatically on login and then unassigns
+them on logout, regardless of how they were originally assigned to the user.

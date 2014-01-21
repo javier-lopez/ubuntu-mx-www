@@ -1,0 +1,160 @@
+<?php
+
+// $Id$
+
+/**
+ * @file
+ * Tests for the Admin function
+ */
+
+class DrupalTeamsAdminTestCase extends DrupalWebTestCase {
+  function getInfo() {
+    return array(
+      'name' => t('Teams admin'),
+      'description' => t('Teams/openid admin functions unit tests'),
+      'group' => t('OpenID Teams'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp('openid', 'openid_teams');
+  }
+
+  public function testOpenidTeamsTrustedNewFormReturnsNonEmptyArray() {
+    $form = openid_teams_trusted_new_form();
+    $result = is_array($form) && !empty($form);
+    $this->assertTrue($result, 'New trusted server form returns a non-empty array');
+  }
+
+  public function testOpenidTeamsTrustedNewFormSubmitSavesData() {
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query('DELETE FROM {openid_teams_trusted}') */
+    db_delete('openid_teams_trusted')
+  ->execute();
+    $fixture = 'http://localhost/';
+    $form = openid_teams_trusted_new_form();
+    $form_state = array(
+      'values' => array(
+        'form_id' => 'openid_teams_trusted_new_form',
+        'new_server' => $fixture,
+      ),
+    );
+    openid_teams_trusted_new_form_submit($form, $form_state);
+    $this->assertEqual($this->countTableRows('trusted'), 1, 'Trusted server added to database');
+    $query = db_query('SELECT * FROM {openid_teams_trusted}');
+    $result = db_fetch_object($query);
+    $this->assertEqual($result->server, $fixture, "Confirm server value. Expected {$fixture}. " .
+                       "Got {$result->server}");
+  }
+
+  public function testOpenidTeamsAdminTrustedDeleteSubmitDeletesRow() {
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query('DELETE FROM {openid_teams_trusted}') */
+    db_delete('openid_teams_trusted')
+  ->execute();
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query("INSERT INTO {openid_teams_trusted} (server) VALUES ('test1')") */
+    $id = db_insert('openid_teams_trusted')
+  ->fields(array(
+      'server' => 'test1',
+    ))
+  ->execute();
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query("INSERT INTO {openid_teams_trusted} (server) VALUES ('test2')") */
+    $id = db_insert('openid_teams_trusted')
+  ->fields(array(
+      'server' => 'test2',
+    ))
+  ->execute();
+    $sid = db_last_insert_id('openid_teams_trusted', 'sid');
+    if ($this->countTableRows('trusted') != 2) {
+      throw new Exception('Test data not added.  Cannot continue.');
+    }
+    $form = array();
+    $form_state = array(
+      'values' => array(
+        'sid' => $sid,
+      ),
+    );
+    openid_teams_admin_trusted_delete_submit($form, $form_state);
+    $result = $this->countTableRows('trusted');
+    $this->assertEqual($result, 1, "Trusted server removed. Expected 1 rows. Got {$result}");
+  }
+
+  public function testOpenidTeamsFormAlterChangesForm() {
+    $form = $fixture = $form_state = array();
+    openid_teams_form_alter($form, $form_state, 'user_admin_settings');
+    $this->assertNotEqual($fixture, $form);
+  }
+
+  public function testOpenidTeamsFormSubmitChangesVariableWhenSet() {
+    variable_set('openid_teams_limit_to_known', FALSE);
+    $form = array();
+    $form_state = array(
+      'values' => array(
+        'form_id' => 'user_admin_settings',
+        'openid_teams_limit_to_known' => '1',
+      ),
+    );
+    openid_teams_form_submit($form, &$form_state);
+    $result = variable_get('openid_teams_limit_to_known', FALSE);
+    $this->assertTrue($result, 'OpenID teams limit variable set');
+  }
+
+  public function testOpenidTeamsFormSubmitChangesVariableWhenNotSet() {
+    variable_set('openid_teams_limit_to_known', TRUE);
+    $form = array();
+    $form_state = array(
+      'values' => array(
+        'form_id' => 'user_admin_settings',
+      ),
+    );
+    openid_teams_form_submit($form, &$form_state);
+    $result = variable_get('openid_teams_limit_to_known', TRUE);
+    $this->assertFalse($result, 'OpenID teams limit variable set');
+  }
+
+  public function testOpenidTeamsAdminFormReturnsNonEmptyArray() {
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query("INSERT INTO {openid_teams_roles} (rid, sid, team) VALUES (2, -1, 'team1')") */
+    $id = db_insert('openid_teams_roles')
+  ->fields(array(
+      'rid' => 2,
+      'sid' => -1,
+      'team' => 'team1',
+    ))
+  ->execute();
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query("INSERT INTO {openid_teams_roles} (rid, sid, team) VALUES (2, -1, 'team2')") */
+    $id = db_insert('openid_teams_roles')
+  ->fields(array(
+      'rid' => 2,
+      'sid' => -1,
+      'team' => 'team2',
+    ))
+  ->execute();
+    $form = openid_teams_admin_form();
+    $result = is_array($form) && !empty($form);
+    $this->assertTrue($result, 'Main admin form returns a non-empty array');
+  }
+
+  public function testOpenidTeamsMenuReturnsNonEmptyArray() {
+    $form = openid_teams_menu();
+    $result = is_array($form) && !empty($form);
+    $this->assertTrue($result, 'Menu hook returns a non-empty array');
+  }
+
+  public function testOpenidTeamsTrustedPageReturnsNonEmptyString() {
+    $content = openid_teams_trusted_page();
+    $result = is_string($content) && !empty($content);
+    $this->assertTrue($result, 'Trusted server management page returns content');
+  }
+
+  private function countTableRows($tablename) {
+    $sql = sprintf('SELECT count(*) AS count FROM {openid_teams_%s}', $tablename);
+    // TODO Please convert this statement to the D7 database API syntax.
+    $query = db_query($sql);
+    $result = db_fetch_object($query);
+    return $result->count;
+  }
+}

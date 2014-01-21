@@ -1,0 +1,71 @@
+<?php
+
+// $Id$
+
+/**
+ * @file
+ * This file contains tests for roles.
+ */
+
+class DrupalTeamsRolesTestCase extends DrupalWebTestCase {
+  function getInfo() {
+    return array(
+      'name' => t('Teams role assignment'),
+      'description' => t('Teams/openid role assignment unit tests'),
+      'group' => t('OpenID Teams'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp('openid_teams');
+  }
+
+  function tearDown() {
+    parent::tearDown();
+  }
+
+  function testClearTeamRoles() {
+    $user = $this->drupalCreateUser(array('access content'));
+    $roles_before = $this->getRoleIdsForUser($user);
+    $roles_assigned = array();
+    for ($assigned = 0; $assigned < 4; $assigned++) {
+      $roles_assigned[] = $this->addRoleForTeamAndUser($assigned, $user);
+    }
+    $roles_now = $this->getRoleIdsForUser($user);
+    if (sizeof($roles_now) - sizeof($roles_before) != $assigned) {
+      throw new Exception('Roles incorrectly assigned. Not running test');
+    }
+    else {
+      variable_set("openid_assigned_roles_{$user->uid}", join(',', $roles_assigned));
+      clear_team_roles($user);
+      variable_del("openid_assigned_roles_{$user->uid}");
+      $roles_after = $this->getRoleIdsForUser($user);
+      $this->assertEqual($roles_before, $roles_after, 'Team roles removed from database');
+    }
+  }
+
+  private function getRoleIdsForUser($user) {
+    $query = db_query('SELECT rid FROM {users_roles} WHERE uid = :uid ORDER BY rid', array(':uid' => $user->uid));
+    $all_rids = array();
+    while ($row = db_fetch_object($query)) {
+      $all_rids[] = $row->rid;
+    }
+    return $all_rids;
+  }
+
+  private function addRoleForTeamAndUser($team_id, $user) {
+    $rid = $this->_drupalCreateRole(array('access content'));
+    // TODO Please convert this statement to the D7 database API syntax.
+    db_query('INSERT INTO {openid_teams_roles} (rid, sid, team) ' .
+             "VALUES (%d, -1, 'team%d')", $rid, $team_id);
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query("INSERT INTO {users_roles} (uid, rid) VALUES (%d, '%s')", $user->uid, $rid) */
+    $id = db_insert('users_roles')
+  ->fields(array(
+      'uid' => $user->uid,
+      'rid' => $rid,
+    ))
+  ->execute();
+    return $rid;
+  }
+}

@@ -1,0 +1,524 @@
+/* PANELS */
+#su-desktop h2 {
+  font-size: 20px;
+  margin: 10px 0 10px
+}
+
+#su-desktop .overview ul {
+  margin: 0;
+  padding: 0;
+}
+#su-desktop .overview li {
+  margin: 0 18px;
+  list-style: none;
+  float: left;
+  width: 274px;
+}
+
+#su-desktop .overview h3 {
+  margin: 10px 0 1px 0;
+  font-size: 13px;
+  text-shadow: none;
+  font-weight: normal;
+}
+
+#su-desktop .secure .pane-content div,
+#su-desktop .secure .pane-content p {
+  margin-left: 16px;
+}
+
+#su-desktop .secure .pane-content div {
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  border: 1px solid #DFDCD9;
+  height: 1%;
+  overflow: hidden;
+  margin-top: 20px;
+  padding: 10px 20px;
+}
+
+#su-desktop .secure ul {
+  float: left;
+  width: 230px;
+  margin: 0;
+  padding: 0;
+}
+#su-desktop .secure ul:last-child {
+  margin-left: 20px;
+}
+
+#su-desktop .secure li {
+  background: url(/sites/default/files/feats-tick.gif) 0 10px no-repeat;
+  list-style: none;
+  float: left;
+  padding: 10px 0 10px 27px;
+  width: 200px;
+  border-bottom: 1px dotted #DFDCD9;
+}
+
+#su-desktop .secure li:last-child {
+  border:0;
+}
+
+#su-desktop .compatible {
+  margin-left: 30px;
+  margin-right: 50px;
+  padding-left: 35px;
+  border-left: 1px solid #F0F0F0;
+}
+
+#su-desktop .compatible h2 {
+  margin-left: -16px;
+}
+
+#su-desktop .compatible img {
+  margin: 40px auto 13px auto;
+  display: block;
+}
+
+#su-desktop .fast img {
+  float: left;
+}
+
+#su-desktop .accessibility img {
+  float: right;
+  margin-left: 30px;
+}
+
+#su-desktop .accessibility p {
+  margin-left: 16px;
+}
+
+/* SLIDESHOW */
+
+#su-desktop .banner {
+	width: 978px;
+	height:450px;
+	background: url('/sites/default/files/scopri-ubuntu_desktop_background.png') no-repeat !important ;
+	margin-bottom: 5px !important;
+}
+
+#su-desktop .banner .slideshow {
+	width: 752px;
+	height:450px;
+  position:relative;
+	overflow:hidden;
+	float:right;
+}
+
+#su-desktop .banner .slideshow #features-ubuntu {
+	/* this cannot be too large */
+	width:20000em;
+	position:absolute;
+}
+
+#su-desktop .banner #features-ubuntu .slide {
+  width: 752px;
+	float:left;
+}
+
+
+/* NAVI */
+#su-desktop .banner #menu_navigator {
+  float: left;
+  padding: 10px 0 0 10px;
+  width: 210px;
+}
+
+#su-desktop .banner #menu_navigator h1 {
+  color: white;
+  margin: 5px 0 10px;
+}
+
+#su-desktop .banner #menu_navigator li {
+  color: #F7F6F6;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 30px;
+  padding-left: 5px;
+}
+
+#su-desktop .banner #menu_navigator li.active {
+  background: #4e4e4a;
+  border-radius: 2px;
+}
+
+
+/* STYLE */
+#su-desktop .banner div,
+#su-desktop .banner span,
+#su-desktop .banner applet,
+#su-desktop .banner object,
+#su-desktop .banner iframe,
+#su-desktop .banner,
+#su-desktop .banner h2,
+#su-desktop .banner h3,
+#su-desktop .banner h4,
+#su-desktop .banner h5,
+#su-desktop .banner h6,
+#su-desktop .banner p,
+#su-desktop .banner blockquote,
+#su-desktop .banner pre,
+#su-desktop .banner a,
+#su-desktop .banner abbr,
+#su-desktop .banner acronym,
+#su-desktop .banner address,
+#su-desktop .banner big,
+#su-desktop .banner cite,
+#su-desktop .banner code,
+#su-desktop .banner del,
+#su-desktop .banner dfn,
+#su-desktop .banner em,
+#su-desktop .banner font,
+#su-desktop .banner img,
+#su-desktop .banner ins,
+#su-desktop .banner kbd,
+#su-desktop .banner q,
+#su-desktop .banner s,
+#su-desktop .banner samp,
+#su-desktop .banner small,
+#su-desktop .banner strike,
+#su-desktop .banner strong,
+#su-desktop .banner sub,
+#su-desktop .banner sup,
+#su-desktop .banner tt,
+#su-desktop .banner var,
+#su-desktop .banner b,
+#su-desktop .banner u,
+#su-desktop .banner i,
+#su-desktop .banner center,
+#su-desktop .banner dl,
+#su-desktop .banner dt,
+#su-desktop .banner dd,
+#su-desktop .banner ol,
+#su-desktop .banner ul,
+#su-desktop .banner li,
+#su-desktop .banner fieldset,
+#su-desktop .banner form,
+#su-desktop .banner label,
+#su-desktop .banner legend,
+#su-desktop .banner table,
+#su-desktop .banner caption,
+#su-desktop .banner tbody,
+#su-desktop .banner tfoot,
+#su-desktop .banner thead,
+#su-desktop .banner tr,
+#su-desktop .banner th,
+#su-desktop .banner td {
+	margin:0;
+	padding:0;
+	border:0;
+	outline:0;
+	font-size: 13px;
+    line-height: 20px;
+	font-style:normal;
+	text-decoration:none;
+	vertical-align:baseline;
+	background:transparent;
+}
+#su-desktop .banner ol,
+#su-desktop .banner ul {
+	list-style:none;
+}
+
+
+
+#su-desktop .banner {
+	margin:0;
+	padding:0;
+	font-family:'Ubuntu', 'UbuntuBeta',sans-serif;
+	font-size:12px;
+	line-height:1.4em;
+	color:#333333;
+	
+	/* no reason to expose this extra stuff to the user */
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	user-select:none;
+	cursor:default;
+}
+
+/*
+Hyperlink-style text
+*/
+#su-desktop .banner a {
+	color:#DD4814;
+	text-decoration:none;
+	display:inline;
+}
+
+#su-desktop .banner .control-arrow {
+	display:block;
+	position:absolute;
+	
+	z-index:100;
+	top:218px;
+	height:64px;
+	width:33px;
+	
+	background-repeat:no-repeat;
+	cursor:pointer;
+}
+#su-desktop .banner .control-arrow:hover {
+	background-position: 0px -65px;
+}
+#su-desktop .banner .control-arrow:active {
+	background-position: 0px -130px;
+}
+#su-desktop .banner .control-arrow#prev-slide {
+	background-image:url('arrow-back.png');
+	left:0px;
+}
+#su-desktop .banner .control-arrow#next-slide {
+	background-image:url('arrow-next.png');
+	left:719px; /* 752px - 33px */
+}
+#su-desktop .banner .disabledarrow {
+   visibility: hidden;
+}
+
+
+/* Fixed container for a slide's title */
+#su-desktop .banner .header {
+	display:table; /* this is a bit evil,
+#su-desktop .banner but it lets us vertically centre stuff */
+	position:absolute;
+	/* FIXME: better to use position:relative here and for .slideshow.
+	   Need to have a specific maximum height, desktop .banner though, which isn't working with display:table */
+	top:0px;
+	width:100%;
+	height:68px;
+	background-color:#3C3B37;
+}
+
+#su-desktop .banner .header > .slidetitle {
+	display:table-cell;
+	/*margin:10px 25px 10px 25px;*/
+	padding:0px 25px;
+	vertical-align:middle;
+	
+	font-size:20px; /* applies to all lines except first */
+/*	line-height:1em;*/
+	color:#DED9CB;
+}
+#su-desktop .banner .slidetitle:first-line {
+	font-size:36px; /* TODO: 24px? */
+	line-height:32px;
+}
+
+#su-desktop .banner .main {
+	position:absolute;
+	top:70px; /* 68px + 2px margin */
+	bottom:2px;
+	left:2px;
+	right:2px;
+	min-height:370px; /* 442px (from .slideshow) - 70px - 2px */
+	
+	/* move this to .slideshow if we don't want the background image to move with slides */
+	background-image:url('background.png');
+}
+
+#su-desktop .banner .main.wide {
+	top:68px;
+	left:0px;
+	right:0px;
+	bottom:0px;
+	background: transparent;
+}
+
+/*
+A slide's body text goes inside here.
+Inner space is 224px wide.
+*/
+#su-desktop .banner .main > .text {
+	position:absolute;
+	z-index:10;
+	top:25px;
+	left:36px;
+	width:248px;
+	bottom:35px;
+	min-height:329px; /* 369 - 25 - 15 (for bottom) */
+	overflow:auto;
+}
+
+#su-desktop .banner .text > div {
+	margin-bottom:8px;
+	padding:6px 12px;
+/*	background-color:#F7F6F6;*/
+  background: #FCFCFC;
+}
+#su-desktop .banner .text > div:last-child {
+	margin-bottom:0px;
+}
+
+#su-desktop .banner .text > div > .subtitle {
+	padding-bottom:2px;
+	margin-bottom:5px;
+	font-size:inherit;
+	text-decoration:none;
+	border-bottom:#333333 dotted 1px;
+}
+
+#su-desktop .banner .main.wide > .text {
+	top:25px;
+	width:350px;
+}
+
+#su-desktop .banner .main.wide > .text > div {
+	background:none;
+}
+
+#su-desktop .banner .main.wide > .text > div > p {
+	color:#F7F6F6;
+	text-shadow:1px 1px 2px #333333;
+}
+
+#su-desktop .banner .featured ul {
+	display:table;
+}
+#su-desktop .banner .featured li {
+	display:table-row;
+}
+#su-desktop .banner .featured li > * {
+	padding-bottom:12px;
+}
+#su-desktop .banner .featured li .icon {
+	display:table-cell;
+	width:24px;
+	height:auto;
+	padding-right:12px;
+}
+#su-desktop .banner .featured li .caption {
+	display:table-cell;
+	vertical-align:middle;
+}
+
+/* Expects screenshot to be 448x304 px */
+#su-desktop .banner .main .screenshot {
+	position:absolute;
+	top:25px;
+	right:6px; /* offsets 2px margin of .main */
+	
+	-webkit-box-shadow:#999999 0px 0px 5px;
+	-moz-box-shadow:#999999 0px 0px 5px;
+	box-shadow:#999999 0px 0px 5px;
+}
+
+/* Expects screenshot to be 748x370 px */
+#su-desktop .banner .main.wide .screenshot {
+	top:0px;
+	right:0px;
+	width:100%;
+	-webkit-box-shadow:none;
+	-moz-box-shadow:none;
+	box-shadow:none;
+}
+
+
+/* CUSTOM */
+
+@font-face {
+  font-family: Ubuntu;
+}
+
+#su-desktop .banner .main {
+  position:relative;
+/*	background-image:url('/sites/default/files/scopri-ubuntu_desktop_main-bg.png');*/
+	left:0;
+	right:0;
+	bottom:0;
+	border-radius:2px 0 0 2px;
+	-moz-border-radius:2px 0 0 2px;
+	-webkit-border-radius:2px 0 0 2px;
+	-khtml-border-radius:2px 0 0 2px;
+	background-attachment: fixed;
+	background: #F0F0F0;
+}
+
+#su-desktop .banner .main > .text {
+  left:25px;
+
+}
+
+#su-desktop .banner .header > .slidetitle {
+  padding:0;
+}
+
+#su-desktop .banner .header {
+  background:transparent;
+}
+
+#su-desktop .banner #download img.screenshot {
+  -moz-box-shadow:none;
+  -webkit-box-shadow:none;
+  box-shadow:none;
+  -khtml-box-shadow:none;
+  right:-40px;
+  top:60px;
+}
+
+#su-desktop .banner .main > .text {
+  overflow: visible;
+}
+#su-desktop .banner .text > div {
+  box-shadow: #DDD 0 1px 3px;
+  -moz-box-shadow: #DDD 0 1px 3px;
+  -khtml-box-shadow: #DDD 0 1px 3px;
+  -webkit-box-shadow: #DDD 0 1px 3px;
+  
+  border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -khtml-border-radius: 2px;
+}
+
+#su-desktop .banner .featured li > * {
+  padding-bottom:5px;
+}
+
+
+#su-desktop .banner .control-arrow#prev-slide {
+  background: url(../images/arrow-back.png);
+}
+
+#su-desktop .banner .control-arrow#next-slide {
+  background: url(../images/arrow-next.png);
+}
+
+#su-desktop .banner .control-arrow {
+  top:236px;
+}
+
+
+/* Fucking cool welcome page */
+
+#su-desktop .banner #welcome {
+/*  margin-top: -52px; */
+}
+
+#su-desktop .banner #welcome .text > div {
+  box-shadow:none;
+  -webkit-box-shadow:none;
+  -moz-box-shadow:none;
+  -khtml-box-shadow:none;
+  margin-top: 54px;
+}
+
+#su-desktop .banner #welcome .header {
+  z-index: 11;  
+}
+
+#su-desktop .banner #welcome .header .slidetitle {
+/*    
+    color: #F7F6F6;
+    padding: 35px 20px 20px;
+*/
+}
+
+#su-desktop .banner #welcome .main.wide .screenshot {
+  border-radius: 4px;
+}
+
+
+

@@ -1,0 +1,125 @@
+=====================
+= Authors / History =
+=====================
+
+This theme came together because of the contributions of many people. You may
+find them in #ubuntu-drupal on irc.freenode.net. It was initially started by
+David Giard (swe3tdate) and later picked up by Michael Lustfield (MTecknology).
+It has since had many patches and contributions from many individuals. At its
+beginning, it was disliked by Canonical because it offered an exact clone of
+the Ubuntu website. Unknown to the authors, this also violated trademarks.
+Following the success of the project, Canonical began driving a community based
+theme that differed from the primary website but offered an unmistakable look
+and feel for community based projects. Because of the trademark policies, this
+theme does not adhere to the base theme provided but instead looks to only
+provide an easy means to include the base for community driven projects.
+
+IRC Nick	Name			Role
+MTecknology	Michael Lustfield	Primary Developer and Lead
+Ddorda		Dor Danker		RTL Theming
+Mongolito404	Pierre Buyle		Research and Support
+swe3tdave	David Giard		Previous Project Lead
+ilo		Inake Lopez		Previous Research
+lajjr		Leo Jackson		Previous Developer
+
+===================
+= Drop Down Menus =
+===================
+
+To enable drop down menus, simpley enable the nice_menus module. The theme will
+check for its existance and use it. It also checks for the deprecated version
+of the theme function if the newer version isn't available.
+
+Currently the theme will not work flawlessly with nice_menus. The 'last' class
+is not being applied which prevents the right sidebar from showing. This issue
+has been addressed in the development version of the module. When version 2 of
+the nice_menus module is released this issue will be resolved and compatibility
+will be removed. Until then, you can use the development version of the module
+and these issues will not apply to you.
+
+==========
+= Styles =
+==========
+
+The ability to easily modify the look of the theme exists. To do this:
+Navigate to: /admin/build/themes/settings/udtheme
+Choose the Color Set you wish to use
+Click "Save Configuration"
+
+=====================
+= GPL Compatibility =
+=====================
+
+Out of the box, this theme is to be 100% GPLv2 and GPLv3 compatible. This also
+means that no trademark policies may be violated. This is a particular concern
+for anyone using an Ubuntu driven theme. As stated in the above section, the
+pieces of the theme that violate trademark policy have been "popped" off to
+avoid conflicts with both GPL licenses and trademark policies.
+
+===============================
+= Including Restricted Pieces =
+===============================
+
+If you are building a website for an Ubuntu related project, then it is
+acceptable to include the parts that were popped off to maintain compatibility
+with other sections. This is only acceptable if your project is directly related
+to Ubuntu or one of its dirivatives.
+
+<note type="side">
+  The general rule of thumb is:
+  If you're directly affiliated with Ubuntu, you can mimic the site very closely
+    This theme will not do that
+  If you're site is related to the community, you can use the community styles
+    This theme enables this ability
+  If you're neither of the above, you need to maintain distinction
+    This theme does so by default
+</note>
+
+To include these popped off sections:
+Navigate to: /admin/build/themes/settings/udtheme
+Choose the Color Set "Official Ubuntu - see http://bit.ly/Hk4DA"
+Find "Theme-specific settings" -> "Ubuntu Affiliated"
+Select "Yes"
+Click "Save Configuration"
+
+Congratulations - your theme should now mimic the official Ubuntu light-base-theme.
+
+If you are not sure if you qualify for using these tweaks, please visit
+http://bit.ly/Hk4DA for details of acceptable use.
+
+==========
+= Issues =
+==========
+
+If you have an issue with the theme, please seek support.
+Questions: https://answers.launchpad.net/ubuntu-drupal-theme
+Bugs: https://bugs.launchpad.net/ubuntu-drupal-theme
+IRC: #ubuntu-drupal on Freenode
+Thank you for downloading the Ubuntu-Drupal theme.
+We've modified it to match the new Ubuntu branding introduced in 2010.
+
+Here are a few configuration options that are unique to this theme, or recommended.
+
+===================
+= Launchpad Login =
+===================
+
+Launchpad login is a convenient way for uses to log in using their existing Launchpad accounts:
+https://launchpad.net/drupal-launchpad
+https://code.launchpad.net/~canonical-isd-hackers/drupal-launchpad/6.x-trunk
+
+Once installed, this this theme has a special appearance for it when used in the
+subheader region, so go to admin > blocks and move "Launchpad Login Button" in
+the "Second Header" region.
+
+==========
+= Search =
+==========
+
+If you choose to have search functionality on your site, it is highly reccomended
+that you enable it by going to admin > themes > configure > ubuntu drupal theme
+then checkmarking the "Search box" in "Toggle display".
+
+Simply moving the search block to a region will not make this block nicely themed.
+
+This way the search box is specially themed in the header.

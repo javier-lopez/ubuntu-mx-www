@@ -1,0 +1,752 @@
+<?php
+// $Id$
+
+/**
+ * An implementation of the OpenID teams extension
+ *
+ * This module allows you to request team membership data from a participating
+ * OpenID server and assign drupal roles based on the response.  Initially,
+ * launchpad.net is the only known implementing provider.  To receive teams data
+ * from Launchpad, you must register your site's trust root by .... [TBC]
+ *
+ * This module also calls the following hooks:
+ *
+ * - openid_teams_request()
+ *   Your function should return a flat array of the teams you want to ask about
+ *
+ * - openid_teams_response(array $teams, url $server)
+ *   Your function should receive a flat array of teams the user is a member of,
+ *   and the url of the openid endpoint which authenticated the user.
+ *   Note: the teams passed to this function have not been checked against a
+ *   known list of trusted servers.  It is the responsibility of the
+ *   implementing module to maintain a list of the server(s) it trusts to
+ *   provide teams data.
+ *
+ * By using these in your own modules, you can request and receive teams data.
+ *
+ * @author Stuart Metcalfe <stu@canonical.com>
+ * @copyright Copyright (c) 2008 Canonical
+ * @license http://www.fsf.org/licensing/licenses/agpl-3.0.html Affero GPL v3
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function openid_teams_menu() {
+  return array(
+    'admin/config/services/openid_teams' => array(
+      'title' => 'OpenID Teams',
+      'description' => 'Map OpenID Teams to user roles',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('openid_teams_admin_form'),
+      'access arguments' => array('administer site configuration'),
+      'type' => MENU_NORMAL_ITEM,
+    ),
+    'admin/config/services/openid_teams/roles' => array(
+      'title' => 'Roles',
+      'description' => 'Map OpenID Teams to user roles',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('openid_teams_admin_form'),
+      'access arguments' => array('administer site configuration'),
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+    ),
+    'admin/config/services/openid_teams/delete' => array(
+      'title' => 'Delete OpenID Team',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('openid_teams_admin_delete'),
+      'access arguments' => array('administer site configuration'),
+      'type' => MENU_CALLBACK,
+    ),
+    'admin/config/services/openid_teams/trusted' => array(
+      'title' => 'Trusted Providers',
+      'description' => 'Set trusted providers for teams data',
+      'page callback' => 'openid_teams_trusted_page',
+      'access arguments' => array('administer site configuration'),
+      'type' => MENU_LOCAL_TASK,
+    ),
+    'admin/config/services/openid_teams/trusted/delete' => array(
+      'title' => 'Delete Trusted Provider',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('openid_teams_admin_trusted_delete'),
+      'access arguments' => array('administer site configuration'),
+      'type' => MENU_CALLBACK,
+    ),
+  );
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Add the ability to limit login/registration to members of known teams to the
+ * drupal
+ */
+function openid_teams_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'user_admin_settings') {
+    if (!isset($form['openid'])) {
+      $form['openid'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('OpenID user options'),
+        '#weight' => -1,
+      );
+    }
+    $form['openid']['openid_teams_limit_to_known'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Only allow members of named teams to register/login'),
+      '#default_value' => variable_get('openid_teams_limit_to_known', FALSE),
+    );
+  }
+}
+
+/**
+ * Implements hook_form_submit().
+ */
+function openid_teams_form_submit($form, &$form_state) {
+  if ($form_state['values']['form_id'] == 'user_admin_settings') {
+    if (isset($form_state['values']['openid_teams_limit_to_known'])) {
+      variable_set('openid_teams_limit_to_known', TRUE);
+    }
+    else {
+      variable_set('openid_teams_limit_to_known', FALSE);
+    }
+  }
+}
+
+/**
+ * Prompt to confirm deletion of a team -> role association
+ */
+function openid_teams_admin_delete($form, &$form_state) {
+  $query = db_select('openid_teams_roles', 'otr');
+  $query->innerjoin('role', 'r', 'otr.rid = r.rid');
+  $assoc = $query->fields('otr', array('tid', 'team'))
+    ->fields('r', array('name'))
+    ->condition('tid', arg(5))
+    ->execute()
+    ->fetch();
+  if ($assoc) {
+    $form['tid'] = array(
+      '#type' => 'hidden',
+      '#value' => $assoc->tid,
+    );
+    $map = array(
+      '%team' => $assoc->team,
+      '%role' => $assoc->name,
+    );
+    $msg = t('Delete the OpenID Team association between %team and the %role ' .
+      'role? This cannot be undone.', $map);
+    return confirm_form(
+      $form,
+      t('Are you sure you want to delete this assocation'),
+      'admin/config/services/openid_teams',
+      $msg,
+      t('Delete'),
+      t('Cancel')
+    );
+  }
+  else {
+    drupal_not_found();
+  }
+}
+
+/**
+ * Implements hook_submit().
+ *
+ * Confirm deletion of a team -> role association
+ */
+function openid_teams_admin_delete_submit($form, &$form_state) {
+  db_delete('openid_teams_roles')
+    ->condition('tid', $form_state['values']['tid'])
+    ->execute();
+  $form_state['redirect'] = 'admin/config/services/openid_teams';
+}
+
+/**
+ * Generate the admin form for managing team -> role associations
+ */
+function openid_teams_admin_form($form, &$form_state) {
+  $form = array();
+  $roles = array();
+  $trusted = openid_teams_get_trusted_list(TRUE);
+  $result = db_select('role', 'ott')
+    ->fields('ott', array('rid', 'name'))
+    ->execute();
+  foreach ($result as $role) {
+    $roles[$role->rid] = $role->name;
+  }
+  $result = db_select('openid_teams_roles', 'otr')
+    ->fields('otr', array('tid', 'team', 'rid', 'sid'))
+    ->execute();
+  $i = 0;
+  foreach ($result as $assoc) {
+    $form['tid_' . $i] = array(
+      '#type' => 'hidden',
+      '#id' => 'tid_' . $assoc->tid,
+      '#default_value' => $assoc->tid,
+    );
+    $form['team_' . $i] = array(
+      '#type' => 'textfield',
+      '#id' => 'team_' . $assoc->tid,
+      '#default_value' => $assoc->team,
+      '#size' => 20,
+    );
+    $form['role_' . $i] = array(
+      '#type' => 'select',
+      '#name' => 'role_' . $i,
+      '#id' => 'role_' . $assoc->tid,
+      '#default_value' => $assoc->rid,
+      '#options' => $roles,
+    );
+    $form['trust_' . $i] = array(
+      '#type' => 'select',
+      '#name' => 'trust_' . $i,
+      '#id' => 'trust_' . $assoc->sid,
+      '#default_value' => $assoc->sid,
+      '#options' => $trusted,
+    );
+    $form['task_' . $i] = array(
+      '#markup' => l(
+        t('[Delete]'),
+        'admin/config/services/openid_teams/delete/' . $assoc->tid
+      ),
+    );
+    $i++;
+  }
+  $form['item_count'] = array(
+    '#type' => 'hidden',
+    '#value' => $i,
+  );
+  $form['team_' . $i] = array(
+    '#type' => 'textfield',
+    '#id' => 'team_new',
+    '#size' => 20,
+  );
+  $form['role_' . $i] = array(
+    '#type' => 'select',
+    '#id' => 'role_new',
+    '#options' => $roles,
+  );
+  $form['trust_' . $i] = array(
+    '#type' => 'select',
+    '#id' => 'trust_new',
+    '#options' => $trusted,
+  );
+  $form['task_' . $i] = array(
+    '#type' => 'markup',
+    '#value' => '<br />',
+  );
+  $form['#prefix'] = '<p>' . t('Associate OpenID Teams with local roles. Roles ' .
+                     'are dynamically assigned and unassigned when users ' .
+                     'login or out so you should be careful to create roles ' .
+                     'specifically for this purpose and not associate general ' .
+                     'roles.') . '</p>';
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save changes'),
+  );
+  return $form;
+}
+
+/**
+ * Theme implementation to render form in table
+ */
+function theme_openid_teams_admin_form($variables) {
+  $form = $variables['form'];
+  $rows = array();
+  for ($i = 0; $i <= $form['item_count']['#value']; $i++) {
+    $rows[] = array(
+      drupal_render($form['tid_' . $i]) . drupal_render($form['team_' . $i]),
+      drupal_render($form['role_' . $i]),
+      drupal_render($form['trust_' . $i]),
+      drupal_render($form['task_' . $i]),
+    );
+    unset($form['tid_' . $i]);
+    unset($form['team_' . $i]);
+    unset($form['role_' . $i]);
+    unset($form['trust_' . $i]);
+    unset($form['task_' . $i]);
+  }
+  $header = array(
+    t('Team'),
+    t('Role'),
+    t('Trust'),
+    array(
+      'data' => t('Operations'),
+      'colspan' => 2,
+    ),
+  );
+  return theme('table', array('header' => $header, 'rows' => $rows)) . drupal_render_children($form);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function openid_teams_theme() {
+  return array(
+    'openid_teams_admin_form' => array(
+      'render element' => 'form',
+    ),
+  );
+}
+
+/**
+ * Implements hook_validate().
+ */
+function openid_teams_admin_form_validate($form, &$form_state) {
+  $roles    = array();
+  $result   = db_select('role', 'ott')->fields('ott')->execute();
+  $max_item = $form_state['values']['item_count'];
+  $trusted  = openid_teams_get_trusted_list(TRUE);
+  foreach ($result as $role) {
+    $roles[$role->rid] = $role->name;
+  }
+  $team_new  = trim($form_state['values']['team_' . $max_item]);
+  $role_new  = trim($form_state['values']['role_' . $max_item]);
+  $trust_new = trim($form_state['values']['trust_' . $max_item]);
+  if (!empty($team_new)) {
+    if (empty($role_new) || !isset($roles[$role_new])) {
+      form_set_error('role_' . $max_item, t('New role not found'));
+    }
+    if (empty($trust_new) || !isset($trusted[$trust_new])) {
+      form_set_error('trust_' . $max_item, t('New trusted server not found'));
+    }
+  }
+  for ($i = 0; $i < $max_item; $i++) {
+    $tid   = $form_state['values']['tid_' . $i];
+    $team  = trim($form_state['values']['team_' . $i]);
+    $role  = trim($form_state['values']['role_' . $i]);
+    $trust = trim($form_state['values']['trust_' . $i]);
+    $has_rows = (bool) db_query_range(
+      'SELECT 1 FROM {openid_teams_roles} WHERE tid = :tid',
+      0, 1,
+      array(':tid' => $form_state['values']['tid_' . $i])
+    )->fetchField();
+    if (!$has_rows) {
+      form_set_error('tid_' . $i, t('Association not found'));
+    }
+    elseif (empty($team)) {
+      form_set_error('team_' . $i, t('Teams cannot be empty'));
+    }
+    elseif (empty($role) || !isset($roles[$role])) {
+      form_set_error('role_' . $i, t('Role not found'));
+    }
+    elseif (empty($trust) || !isset($trusted[$trust])) {
+      form_set_error('trust_' . $i, t('Trusted server not found'));
+    }
+  }
+}
+
+/**
+ * Implements hook_submit().
+ */
+function openid_teams_admin_form_submit($form, &$form_state) {
+  $max_item  = $form_state['values']['item_count'];
+  $team_new  = trim($form_state['values']['team_' . $max_item]);
+  $role_new  = trim($form_state['values']['role_' . $max_item]);
+  $trust_new = trim($form_state['values']['trust_' . $max_item]);
+  if (!empty($team_new)) {
+    $tid = db_insert('openid_teams_roles')
+      ->fields(array(
+        'rid' => $role_new,
+        'sid' => $trust_new,
+        'team' => $team_new,
+      ))
+      ->execute();
+  }
+  for ($i = 0; $i < $max_item; $i++) {
+    $tid   = $form_state['values']['tid_' . $i];
+    $team  = trim($form_state['values']['team_' . $i]);
+    $role  = trim($form_state['values']['role_' . $i]);
+    $trust = trim($form_state['values']['trust_' . $i]);
+    db_update('openid_teams_roles')
+      ->fields(array(
+        'team' => $team,
+        'rid' => $role,
+        'sid' => $trust,
+      ))
+      ->condition('tid', $tid)
+      ->execute();
+  }
+  drupal_set_message(t('Saved changes'));
+  $form_state['redirect'] = 'admin/config/services/openid_teams';
+}
+
+/**
+ * Get the page to manage trusted servers
+ */
+function openid_teams_trusted_page() {
+  $content = '<p>' .
+    t('Maintain a list of trusted openid servers here which can be associated' .
+    'with team to role mappings to prevent untrusted servers from assigning roles to your users.') .
+    '</p>';
+  $items = array();
+  $trusted = openid_teams_get_trusted_list();
+  if (sizeof($trusted) > 0) {
+    foreach ($trusted as $sid => $server) {
+      $items[] = array(
+        $server,
+        '<small>[' . l(t('Delete'), 'admin/config/services/openid_teams/trusted/delete/' .
+          $sid) . ']</small>',
+      );
+    }
+    $content .= theme('table', array('header' => array(t('Server'), t('Operation')), 'rows' => $items));
+  }
+  else {
+    $content .= '<p>' . t('No trusted servers configured') . '</p>';
+  }
+  $form = drupal_get_form('openid_teams_trusted_new_form');
+  $content .= drupal_render($form);
+  return $content;
+}
+
+/**
+ * Get the 'add new trusted server' form
+ */
+function openid_teams_trusted_new_form() {
+  $form = array();
+  $form['#prefix'] = '<div class="container-inline">';
+  $form['#suffix'] = '<div class="description">' .
+    t('Enter the full openid endpoint url for the trusted server (* is wildcard)') .
+    '</div></div>';
+  $form['new_server'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Trusted server'),
+    '#size' => 30,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add'),
+  );
+  return $form;
+}
+
+/**
+ * Implements hook_submit().
+ */
+function openid_teams_trusted_new_form_submit($form, &$form_state) {
+  if ($form_state['values']['form_id'] == 'openid_teams_trusted_new_form') {
+    $sid = db_insert('openid_teams_trusted')
+      ->fields(array('server' => $form_state['values']['new_server']))
+      ->execute();
+    drupal_set_message(t('Trusted server added'));
+    $form_state['redirect'] = 'admin/config/services/openid_teams/trusted';
+  }
+}
+
+/**
+ * Prompt to confirm deletion of a trusted server
+ */
+function openid_teams_admin_trusted_delete($form, &$form_state) {
+  $record = db_select('openid_teams_trusted', 'ott')
+    ->fields('ott', array('sid', 'server'))
+    ->condition('sid', arg(6))
+    ->execute()
+    ->fetch();
+  if ($record) {
+    $form['sid'] = array(
+      '#type' => 'hidden',
+      '#value' => $record->sid,
+    );
+    $msg = t('Delete the trusted server %server?  This cannot be undone.',
+      array('%server' => $record->server));
+    return confirm_form($form, t('Are you sure you want to delete this trusted server'),
+      'admin/config/services/openid_teams/trusted', $msg,
+      t('Delete'), t('Cancel'));
+  }
+  else {
+    drupal_not_found();
+  }
+}
+
+/**
+ * Implements hook_submit().
+ */
+function openid_teams_admin_trusted_delete_submit($form, &$form_state) {
+  db_delete('openid_teams_trusted')
+    ->condition('sid', $form_state['values']['sid'])
+    ->execute();
+   db_update('openid_teams_roles')
+    ->fields(array('sid' => 0))
+    ->condition('sid', $form_state['values']['sid'])
+    ->execute();
+  $form_state['redirect'] = 'admin/config/services/openid_teams/trusted';
+}
+
+/**
+ * Implements hook_openid().
+ */
+function openid_teams_openid($op, $request = array(), $response = array()) {
+  switch ($op) {
+    case 'request':
+      $all_teams = get_current_teams();
+      array_merge($all_teams, module_invoke_all('openid_teams_request'));
+      if (!empty($all_teams)) {
+        $request['openid.ns.lp'] = 'http://ns.launchpad.net/2007/openid-teams';
+        $request['openid.lp.query_membership'] = join(',', $all_teams);
+      }
+      return $request;
+
+    case 'extension':
+      return 'lp';
+  }
+}
+
+/**
+ * Implements hook_user_login().
+ */
+function openid_teams_user_login(&$edit, $account) {
+  if (TRUE) {
+    // Clear the user's cached menu
+    cache_clear_all($account->uid . ':', 'cache_menu', TRUE);
+    clear_team_roles($account);
+    $roles_map = get_roles_teams_map();
+    $teams = array();
+    // Catch user logging in after registration and set teams
+    if (isset($_SESSION['approved_team_mappings'])) {
+      $server    = $_SESSION['openid_server'];
+      $raw_teams = explode(',', $_SESSION['raw_teams']);
+      $teams     = explode(',', $_SESSION['approved_team_mappings']);
+      unset($_SESSION['openid_server']);
+      unset($_SESSION['raw_teams']);
+      unset($_SESSION['approved_team_mappings']);
+    }
+    else {
+      module_load_include('inc', 'openid', 'openid');
+      $response  = _openid_response();
+      $server    = $response['openid.op_endpoint'];
+      $raw_teams = explode(',', $response['openid.lp.is_member']);
+      $teams     = get_approved_team_mappings($response['openid.lp.is_member'],
+                                              $server);
+    }
+    if (empty($teams) && variable_get('openid_teams_limit_to_known', FALSE) && $account->uid != 1) {
+      module_load_include('inc', 'user', 'user.pages');
+      user_logout();
+    }
+    clear_team_roles($account);
+    $current = get_role_ids_assigned_to_user($account);
+    $assigned = array();
+    foreach ($teams as $mid) {
+      if (isset($roles_map[$mid]) && should_assign_role($roles_map[$mid], $current, $assigned)) {
+        $id = db_insert('users_roles')
+          ->fields(array(
+            'uid' => $account->uid,
+            'rid' => $roles_map[$mid],
+          ))
+          ->execute();
+        $assigned[] = $roles_map[$mid];
+      }
+    }
+    if (sizeof($assigned) > 0) {
+      variable_set("openid_assigned_roles_{$account->uid}", join(',', $assigned));
+    }
+    module_invoke_all('openid_teams_response', $raw_teams, $server);
+  }
+}
+
+/**
+ * Implements hook_user_logout().
+ */
+function openid_teams_user_logout($account) {
+  if (TRUE) {
+    clear_team_roles($account);
+  }
+}
+
+/**
+ * Clear the openid-assigned roles for the specified account
+ *
+ * @param object $account The user object
+ */
+function clear_team_roles($account) {
+  $assigned_roles = variable_get("openid_assigned_roles_{$account->uid}", "");
+  if (!empty($assigned_roles)) {
+    $roles = array();
+    $roles = explode(',', $assigned_roles);
+    db_delete('users_roles')
+      ->condition('uid', $account->uid)
+      ->condition('rid', $roles, 'IN')
+      ->execute();
+  }
+  variable_del("openid_assigned_roles_{$account->uid}");
+}
+
+/**
+ * Check if the role has already been assigned to the user manually or in this login session
+ *
+ * @param integer $rid
+ * @param array $current_roles
+ * @param array $assigned_roles
+ * @return boolean
+ */
+function should_assign_role($rid, $current_roles, $assigned_roles) {
+  return !in_array($rid, $current_roles) && !in_array($rid, $assigned_roles);
+}
+
+/**
+ * Get the role ids already assigned to the user
+ *
+ * @param object $user
+ * @return array
+ */
+function get_role_ids_assigned_to_user($user) {
+  $rids = array();
+  $result = db_select('users_roles', 'ur')
+    ->fields('ur', array('rid'))
+    ->condition('uid', $user->uid)
+    ->execute();
+  foreach ($result as $row) {
+    $rids[] = $row->rid;
+  }
+  return $rids;
+}
+
+/**
+ * Get an array of the current mapped teams in the database
+ *
+ * @return array
+ */
+function get_current_teams() {
+  $teams = array();
+  $result = db_select('openid_teams_roles', 'otr')
+    ->fields('otr', array('team'))
+    ->distinct()
+    ->execute();
+  foreach ($result as $team) {
+    $teams[] = $team->team;
+  }
+  return $teams;
+}
+
+/**
+ * OpenID response hook
+ *
+ * One recognised operation:
+ * - user_register
+ *   When a user is not recognised and is prompted for registration data
+ */
+function openid_teams_openid_response($op, $response, $edit = array()) {
+  if ($op == 'user_register') {
+    // Store teams data for later use
+    $server    = $response['openid.op_endpoint'];
+    $raw_teams = $response['openid.lp.is_member'];
+    $teams     = get_approved_team_mappings($response['openid.lp.is_member'], $server);
+    if (empty($teams) && variable_get('openid_teams_limit_to_known', FALSE)) {
+      module_load_include('inc', 'user', 'user.pages');
+      user_logout();
+    }
+    $_SESSION['openid_server'] = $server;
+    $_SESSION['raw_teams'] = $raw_teams;
+    $_SESSION['approved_team_mappings'] = join(',', $teams);
+  }
+}
+
+/**
+ * Get a list of trusted servers
+ *
+ * @param boolean $prepend_any_option If TRUE, adds 'Any server' with index -1
+ *        to the beginning of the list (Default FALSE)
+ * @return array
+ */
+function openid_teams_get_trusted_list($prepend_any_option = FALSE) {
+  $servers = array();
+  $result = db_select('openid_teams_trusted', 'ott')->fields('ott')->execute();
+  if ($prepend_any_option) {
+    $servers[-1] = t('Any server');
+  }
+  foreach ($result as $row) {
+    $servers[$row->sid] = $row->server;
+  }
+  return $servers;
+}
+
+/**
+ * Given a list of teams and a server, returns the map ids which are approved
+ *
+ * @param array|string $teams A comma separated string or an array of teams
+ * @param string $server The server making the request
+ * @return array An array of approved ids from the openid_teams_roles table
+ */
+function get_approved_team_mappings($teams, $server) {
+  if (!is_array($teams)) {
+    $teams = explode(',', $teams);
+  }
+  $approved = array();
+  foreach ($teams as $team) {
+    $map_ids = get_team_role_ids($team, $server);
+    foreach ($map_ids as $map_id) {
+      $approved[] = $map_id;
+    }
+  }
+  return $approved;
+}
+
+/**
+ * Given a team and a server, returns the team/role map ids
+ *
+ * @param string $team
+ * @param string $server
+ * @return array an array of integers (map ids)
+ */
+function get_team_role_ids($team, $server) {
+  static $mapped_roles;
+  $map_ids = array();
+  if (!is_array($mapped_roles)) {
+    $mapped_roles = array();
+    $query = db_select('openid_teams_roles', 'otr');
+    $query->join('openid_teams_trusted', 'ott', 'otr.sid = ott.sid');
+    $query->fields('otr', array('tid', 'rid', 'team'))
+      ->fields('ott', array('server'));
+    $result = $query->execute();
+    foreach ($result as $map) {
+      $mapped_roles[$map->team][] = $map;
+    }
+  }
+  if (isset($mapped_roles[$team])) {
+    foreach ($mapped_roles[$team] as $map) {
+      if (empty($map->server) || TRUE === fnmatch($map->server, $server)) {
+        $map_ids[] = $map->tid;
+      }
+    }
+  }
+  return $map_ids;
+}
+
+/**
+ * Get an array representation of the teams -> roles map
+ *
+ * array(
+ *   'team name' => array('drupal role id', ...),
+ *   ...
+ * )
+ *
+ * @return array
+ */
+function get_teams_roles_map() {
+  $roles_map = array();
+  $result = db_select('openid_teams_roles', 'otr')
+    ->fields('otr')
+    ->execute();
+  foreach ($result as $map) {
+    $roles_map[$map->team][] = $map->rid;
+  }
+  return $roles_map;
+}
+
+/**
+ * Get an array representation of the teams mapping -> roles map
+ *
+ * array(
+ *   'teams map id' => 'drupal role id',
+ *   ...
+ * )
+ *
+ * @return array
+ */
+function get_roles_teams_map() {
+  $roles_map = array();
+  $result = db_select('openid_teams_roles', 'otr')
+    ->fields('otr')
+    ->execute();
+  foreach ($result as $map) {
+    $roles_map[$map->tid] = $map->rid;
+  }
+  return $roles_map;
+}

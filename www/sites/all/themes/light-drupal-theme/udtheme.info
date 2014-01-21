@@ -1,0 +1,44 @@
+; $Id$
+name = Ubuntu-it Drupal Theme
+description = Ubuntu-it Drupal is a theme for Ubuntu Italian LoCo web site. Based on the new branding introduced for Ubuntu in 2010.
+core = 7.x
+version = 7.7.0
+engine = phptemplate
+
+settings[page_maxwidth] = 985px
+settings[page_minwidth] = ''
+settings[ubuntu_footer] = unset
+settings[udtheme_style] = classic-brown
+settings[udtheme_trademark] = 0
+settings[render_search] = 0
+settings[display_help] = 0
+settings[ubuntu_footer] = 1
+settings[ubuntu_footer_text] = unset
+
+scripts[] = js/cookies.js
+scripts[] = js/accessibility.js
+scripts[] = js/panels.js
+scripts[] = js/main.js
+scripts[] = js/community.js
+scripts[] = js/home.js
+scripts[] = js/archive-newsletter.js
+
+stylesheets[all][] = styles/all.css
+
+regions[top_header] = Top Header
+regions[subheader] = Second Header
+regions[above_content] = Above Content and Sidebars
+regions[top_content] = Above Content and Between Sidebars
+regions[left] = Left Sidebar
+regions[right] = Right Sidebar
+regions[content] = Below Content
+regions[footer] = Footer
+
+features[] = main_menu
+features[] = secondary_menu
+features[] = favicon
+features[] = logo
+
+files[] = page.tpl.php
+files[] = template.php
+files[] = theme-settings.php

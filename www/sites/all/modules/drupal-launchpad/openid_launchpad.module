@@ -1,0 +1,495 @@
+<?php
+// $Id$
+
+/**
+ * An extension of the openid module to use launchpad.net as a single sign-on
+ * provider
+ *
+ * This module:
+ * - Removes/prevents access to various menus and other items which don't really
+ *   belong in a single sign-on environment.  Configure in user settings.
+ * - Syncs username and email with launchpad on login (optional)
+ * - Provides a /launchpad path to initiate an OpenID transaction with
+ *   launchpad.
+ * - Provides a launchpad 'login' block.
+ * - Limits OpenID transactions to specified launchpad server only (requires
+ *   patched version of OpenID module).  Configure in block configuration.
+ *
+ * @author Stuart Metcalfe <stu@canonical.com>
+ * @copyright Copyright (c) 2008 Canonical
+ * @license http://www.fsf.org/licensing/licenses/agpl-3.0.html Affero GPL v3
+ */
+
+define('LAUNCHPAD_PRODUCTION_URL', 'https://login.launchpad.net/');
+define('LAUNCHPAD_PRODUCTION_OP', LAUNCHPAD_PRODUCTION_URL . '+openid');
+define('LAUNCHPAD_TESTING_URL', 'https://login.demo.launchpad.net/');
+define('LAUNCHPAD_TESTING_OP', LAUNCHPAD_TESTING_URL . '+openid');
+define('LAUNCHPAD_STAGING_URL', 'https://login.staging.launchpad.net/');
+define('LAUNCHPAD_STAGING_OP', LAUNCHPAD_STAGING_URL . '+openid');
+define('UBUNTU_SSO_PRODUCTION_URL', 'https://login.ubuntu.com/');
+define('UBUNTU_SSO_PRODUCTION_OP', UBUNTU_SSO_PRODUCTION_URL . '+openid');
+define('UBUNTU_SSO_STAGING_URL', 'https://login.staging.ubuntu.com/');
+define('UBUNTU_SSO_STAGING_OP', UBUNTU_SSO_STAGING_URL . '+openid');
+
+/**
+ * Implements hook_menu().
+ */
+function openid_launchpad_menu() {
+  return array(
+    'launchpad' => array(
+      'title' => 'Launchpad',
+      'page callback' => 'openid_launchpad_path_action',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+    ),
+    'admin/config/services/launchpad' => array(
+      'title' => 'Launchpad Settings',
+      'description' => 'Manage Launchpad settings',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('launchpad_admin_overview'),
+      'access arguments' => array('access administration pages'),
+      'type' => MENU_NORMAL_ITEM,
+    ),
+  );
+}
+
+/**
+ * Implements hook_perm().
+ */
+function openid_launchpad_permission() {
+  return array(
+    'administer own openids' => array(
+      'title' => t('Administer Own OpenIDs'),
+      'description' => t('Give users the ability to manage their own OpenID URLs.'),
+    ),
+  );
+}
+
+function openid_user_edit_access() {
+  global $user;
+  return (user_access('administer users') || ($user->uid == arg(1) && user_access('administer own openids')));
+}
+
+function openid_launchpad_menu_alter(&$callbacks) {
+  $callbacks['user/%user/openid/delete']['access callback'] = 'openid_user_edit_access';
+  $callbacks['user/%user/openid']['access callback'] = 'openid_user_edit_access';
+  if (prevent_non_openid_registrations()) {
+    $callbacks['user/login']['access callback'] = 'allow_login_page_access';
+    $callbacks['user/register']['access callback'] = 'allow_register_page_access';
+    $callbacks['user/password']['access callback'] = 'allow_password_page_access';
+  }
+  if (hide_user_account_pages()) {
+    $callbacks['user/%user_uid_optional']['access callback'] = 'allow_user_account_page_access';
+    $callbacks['user/%user_category/edit']['access callback'] = 'allow_user_account_page_access';
+  }
+}
+
+function prevent_non_openid_registrations() {
+  return variable_get('openid_launchpad_prevent_register', FALSE);
+}
+
+function hide_user_account_pages() {
+  return variable_get('openid_launchpad_hide_account', FALSE);
+}
+
+function allow_login_page_access() {
+  return !allow_non_login_page_access();
+}
+
+function allow_register_page_access() {
+  return allow_non_login_page_access();
+}
+
+function allow_password_page_access() {
+  return FALSE;
+}
+
+function allow_non_login_page_access() {
+  if (isset($_SESSION['openid']['values'])) {
+    return $_SESSION['openid']['values']['response']['status'] == 'success';
+  }
+  else {
+    return FALSE;
+  }
+}
+
+function allow_user_account_page_access() {
+  global $user;
+  return $user->uid == 1;
+}
+
+/**
+ * Handle the /launchpad path request
+ *
+ * Initiates an OpenID transaction with launchpad using a GET request rather
+ * than the usual drupal OpenID form.
+ *
+ * @return The response from openid_begin()
+ */
+function openid_launchpad_path_action() {
+  $return_to = url('openid/authenticate', array('absolute' => TRUE));
+  $openid = variable_get('openid_launchpad_server', LAUNCHPAD_PRODUCTION_URL);
+  return openid_begin($openid, $return_to);
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function openid_launchpad_form_alter(&$form, &$form_state, $form_id) {
+  switch ($form_id) {
+    case 'user_profile_form':
+      $form = alter_user_profile_form($form);
+      break;
+
+    case 'user_admin_settings':
+      $form = alter_user_admin_settings_form($form);
+      break;
+
+    case 'user_register':
+      $form = alter_user_register_form($form);
+      break;
+
+    case 'user_login':
+      $form = alter_user_login_form($form);
+      break;
+
+    case 'openid_user_add':
+      $form = alter_openid_user_add_form($form);
+      break;
+
+  }
+}
+
+/**
+ * Replace the OpenID free text entry for an "Add a Launchpad OpenID" button
+ */
+function alter_openid_user_add_form($form) {
+  global $user;
+  if ($user->uid != 1) {
+    $form['openid_identifier'] = array(
+      '#type' => 'hidden',
+      '#value' => variable_get('openid_launchpad_server', LAUNCHPAD_PRODUCTION_URL),
+    );
+    $form['submit'] = array('#type' => 'submit', '#value' => t('Add a Launchpad OpenID'));
+  }
+  return $form;
+}
+/**
+ * Remove password from the user profile form for non-admin users
+ */
+function alter_user_profile_form($form) {
+  global $user;
+  if ($user->uid != 1) {
+    $form['account']['pass'] = FALSE;
+  }
+  return $form;
+}
+
+/**
+ * Add the option to disable 'My Account' to the 'User settings' form
+ */
+function alter_user_admin_settings_form($form) {
+  $form['#submit'][] = 'openid_launchpad_system_settings_form_submit';
+  if (!isset($form['openid'])) {
+    $form['openid'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Launchpad user options'),
+      '#weight' => -1,
+    );
+  }
+  $form['openid']['note'] = array(
+    '#value' => t('You can configure several user-related settings in the ' .
+                  '<a href="@link">Launchpad module configuration</a>.',
+                  array('@link' => url('admin/settings/launchpad'))),
+  );
+  return $form;
+}
+
+/**
+ * Strip openid-related messages and hide the username field if valid
+ */
+function alter_user_register_form($form) {
+  strip_openid_messages();
+  $form = hide_username_form_field_if_valid($form);
+  return $form;
+}
+
+function strip_openid_messages() {
+  $messages = drupal_get_messages();
+  foreach ($messages as $type => $type_messages) {
+    // Process these in reverse order so that the list order remains unchanged
+    for ($i = count($type_messages) - 1; $i >= 0; $i--) {
+      $message = eregi_replace('OpenID', 'Launchpad ID', $type_messages[$i]);
+      $message = eregi_replace('<a[^>]*>(.+)</a>', '\\1', $message);
+      drupal_set_message(check_plain($message), check_plain($type));
+    }
+  }
+}
+
+function hide_username_form_field_if_valid($form) {
+  if (username_will_be_accepted($form['name']['#default_value'])) {
+    $form['name']['#type'] = 'hidden';
+  }
+  return $form;
+}
+
+function username_will_be_accepted($username) {
+  if (user_validate_name($username) !== NULL) {
+    return FALSE;
+  }
+  elseif (user_load_by_name($username)) {
+    return FALSE;
+  }
+  elseif (drupal_is_denied('user', $username)) {
+    return FALSE;
+  }
+  else {
+    return TRUE;
+  }
+}
+
+/**
+ * Remove normal OpenID fields
+ */
+function alter_user_login_form($form) {
+  unset($form['openid_identifier']);
+  unset($form['openid_links']);
+  unset($form['user_link']);
+  unset($form['name']['#prefix']);
+  unset($form['name']['#suffix']);
+  unset($form['pass']['#prefix']);
+  unset($form['pass']['#suffix']);
+  return $form;
+}
+
+/**
+ * Implements hook_form_submit().
+ */
+function openid_launchpad_system_settings_form_submit($form, &$form_state) {
+  menu_rebuild();
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function openid_launchpad_block_info() {
+  $blocks[0]['info'] = t('Launchpad Login Button');
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function openid_launchpad_block_view($delta = '') {
+  global $user;
+  if ($delta == 0) {
+    // For usability's sake, avoid showing two login forms on one page.
+    // Also, this avoids mucking up the user/pass form with openid's js.
+    if (!$user->uid && !(arg(0) == 'user' && !is_numeric(arg(1)))) {
+      $block['subject'] = t('Login');
+      $form = drupal_get_form('openid_launchpad_contents');
+      $block['content'] = drupal_render($form);
+      return $block;
+    }
+  }
+}
+
+/**
+ * Get the launchpad login block contents as a form array
+ */
+function openid_launchpad_contents() {
+  $form = array(
+    '#action' => url($_GET['q'], array('query' => drupal_get_destination())),
+    '#id' => 'openid-launchpad-login-form',
+    '#base' => 'user_login',
+  );
+  $form['openid_identifier'] = array(
+    '#type' => 'hidden',
+    '#value' => variable_get('openid_launchpad_server', LAUNCHPAD_PRODUCTION_URL),
+    '#required' => TRUE,
+  );
+  $form['submit'] = array('#type' => 'submit',
+    '#value' => t('Log in'),
+  );
+  $form['openid.return_to'] = array(
+    '#type' => 'hidden',
+    '#value' => url('openid/authenticate', array('query' => drupal_get_destination(),
+                    'absolute' => TRUE))
+  );
+  $form['#validate'] = array('openid_login_validate');
+  return $form;
+}
+
+/**
+ * Implements hook_openid_response().
+ *
+ * Instead of using the user's openid as their username if a nickname isn't returned in the
+ * response, we want to set it to empty so they are forced to create one.  This prevents exposing
+ * their actual openid.  In practice, this is unlikely to happen as launchpad now exposes the user's
+ * username in all responses without needing a recognised trust root.
+ */
+function openid_launchpad_openid_response($op, $response, $edit = array()) {
+  // Information from $response moved to $op in D7 (from D6).
+  $from_endpoint = $op['openid.op_endpoint'];
+  $expected_endpoint = get_expected_endpoint();
+  if ($from_endpoint != $expected_endpoint) {
+    drupal_get_messages(); // Clear the message queue
+    drupal_set_message(t("Sorry, but we don't accept OpenIDs from your server (@server)",
+                        array('@server' => $from_endpoint)), 'error');
+    drupal_goto();
+  }
+  elseif ($op['status'] == 'user_register') {
+    $edit['name'] = (empty($op['openid.sreg.nickname'])) ?
+                    '' : $op['openid.sreg.nickname'];
+    return $edit;
+  }
+}
+
+function get_expected_endpoint() {
+  $endpoints = array(LAUNCHPAD_PRODUCTION_URL => LAUNCHPAD_PRODUCTION_OP,
+                      LAUNCHPAD_TESTING_URL => LAUNCHPAD_TESTING_OP,
+                      LAUNCHPAD_STAGING_URL => LAUNCHPAD_STAGING_OP,
+                      LAUNCHPAD_STAGING_URL => LAUNCHPAD_STAGING_OP,
+                      UBUNTU_SSO_PRODUCTION_URL => UBUNTU_SSO_PRODUCTION_OP,
+                      UBUNTU_SSO_STAGING_URL => UBUNTU_SSO_STAGING_OP);
+  $current_server = variable_get('openid_launchpad_server', LAUNCHPAD_PRODUCTION_URL);
+  return $endpoints[$current_server];
+}
+
+/**
+ * Implements hook_user_login().
+ *
+ * Syncronise the user's name and email with launchpad if enabled
+ */
+function openid_launchpad_user_login(&$edit, $account) {
+  global $user;
+  if (variable_get('openid_launchpad_sync_user', FALSE)) {
+    module_load_include('inc', 'openid', 'openid');
+    $response = _openid_response();
+    if (isset($response['openid.mode'])) {
+      $save     = array();
+      $nickname = (empty($response['openid.sreg.nickname'])) ?
+                  '' : $response['openid.sreg.nickname'];
+      $email    = (empty($response['openid.sreg.email'])) ?
+                  '' : $response['openid.sreg.email'];
+      // Username and email validation code adapted from user.module
+      // Update username if changed on launchpad
+      if (!empty($nickname) && $nickname != $account->name) {
+        if ($error = user_validate_name($nickname)) {
+          drupal_set_message(check_plain($error), 'error');
+        }
+        elseif (db_query('SELECT COUNT(uid) FROM {users} WHERE uid <> :uid AND LOWER(name) = LOWER(:nickname)',
+                array(':uid' => $account->uid, ':nickname' => $nickname))->fetchField() > 0) {
+          drupal_set_message(t('Could not update your name: %name is already taken.',
+                              array('%name' => $nickname)), 'error');
+        }
+        elseif (drupal_is_denied('user', $nickname)) {
+          drupal_set_message(t('Could not update your name: %name has been ' .
+                             'denied access.', array('%name' => $nickname)),
+                             'error');
+        }
+        else {
+          $save_values['name'] = $nickname;
+        }
+      }
+      // Update email if changed on launchpad
+      if (!empty($email) && $email <> $account->mail) {
+        if (db_query('SELECT COUNT(uid) FROM {users} WHERE uid <> :uid AND LOWER(mail) = LOWER(:email)',
+                array(':uid' => $account->uid, ':email' => $email))->fetchField() > 0) {
+          drupal_set_message(t('Could not update your e-mail: the address %email is already ' .
+                             'registered.', array('%email' => $email)), 'error');
+        }
+        elseif (drupal_is_denied('mail', $email)) {
+          drupal_set_message(t('Could not update your e-mail: the address %email has been denied ' .
+                             'access.', array('%email' => $email)), 'error');
+        }
+        else {
+          $save_values['mail'] = $email;
+        }
+      }
+      // Save changes
+      if (!empty($save_values)) {
+        user_save($account, $save_values);
+      }
+    }
+  }
+}
+
+function launchpad_admin_overview() {
+  $realm_url = url('', array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
+  $realm_str = t('This site\'s trust root/realm is: <a href="!url">!url</a>',
+                array('!url' => $realm_url));
+  $user_url = url('admin/user/settings');
+  $user_str = t('To edit User Settings, go to <a href="!url">user settings</a>.',
+                array('!url' => $user_url));
+  $form = array();
+  $form['#submit'] = array('launchpad_admin_overview_submit');
+
+  $form['trust_root'] = array(
+    '#type' => 'markup',
+    '#value' => "<p><strong>$realm_str</strong></p><hr />",
+  );
+  $form['openid_launchpad_server'] = array(
+    '#type'    => 'radios',
+    '#title'   => t('Select server'),
+    '#options' => array(
+        LAUNCHPAD_PRODUCTION_URL  => t('Production') . " (" . LAUNCHPAD_PRODUCTION_URL . ")",
+        LAUNCHPAD_STAGING_URL     => t('Staging') . " (" . LAUNCHPAD_STAGING_URL . ")",
+        LAUNCHPAD_TESTING_URL     => t('Testing') . " (" . LAUNCHPAD_TESTING_URL . ")",
+        UBUNTU_SSO_PRODUCTION_URL => t('Ubuntu SSO production') . " (" . UBUNTU_SSO_PRODUCTION_URL . ")",
+        UBUNTU_SSO_STAGING_URL    => t('Ubuntu SSO staging') . " (" . UBUNTU_SSO_STAGING_URL . ")",
+   ),
+    '#default_value' => variable_get('openid_launchpad_server', LAUNCHPAD_PRODUCTION_URL),
+  );
+  $form['sso'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('SSO Features'),
+    '#weight' => 3
+  );
+  $form['sso']['--'] = array('#value' => "These features together make the site work in Single-Sign-On mode, but you can enable/disable them individually");
+  $form['sso']['openid_launchpad_hide_account'] = array(
+      '#type' => 'checkbox',
+      '#title' => t("Prevent users from accessing 'My Account' functionality"),
+      '#default_value' => variable_get('openid_launchpad_hide_account', FALSE),
+  );
+  $form['sso']['openid_launchpad_sync_user'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Keep users\' name and email in sync with launchpad'),
+      '#default_value' => variable_get('openid_launchpad_sync_user', FALSE),
+  );
+  $form['sso']['openid_launchpad_prevent_register'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Prevent users from using the registration form'),
+      '#default_value' => variable_get('openid_launchpad_prevent_register', FALSE),
+      '#description' => t('Use this if you have selected \'Visitors can create ' .
+                      'accounts\' in User Settings but want to prevent people ' .
+                      'from registering without using launchpad.  Also prevents access ' .
+                      'to the password reminder form'),
+  );
+  $form[''] = array(
+    '#type' => 'markup',
+    '#value' => "<p>$user_str</p>",
+    '#weight' => 5,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save Settings'),
+    '#weight' => 10,
+  );
+  return $form;
+}
+
+function launchpad_admin_overview_submit($form, &$form_state) {
+  if (!isset($form_state['values']['openid_launchpad_server'])) {
+    variable_set('openid_launchpad_server', LAUNCHPAD_PRODUCTION_URL);
+  }
+  else {
+    variable_set('openid_launchpad_server', $form_state['values']['openid_launchpad_server']);
+  }
+  variable_set('openid_launchpad_hide_account', $form_state['values']['openid_launchpad_hide_account']);
+  variable_set('openid_launchpad_sync_user', $form_state['values']['openid_launchpad_sync_user']);
+  variable_set('openid_launchpad_prevent_register', $form_state['values']['openid_launchpad_prevent_register']);
+  menu_router_build(True);
+  drupal_set_message(t('Settings saved'));
+  return 'admin/settings/launchpad';
+}

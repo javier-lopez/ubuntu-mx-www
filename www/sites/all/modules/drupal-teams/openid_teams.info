@@ -1,0 +1,9 @@
+; $Id$
+name = OpenID Teams
+description = "An implementation of the OpenID teams extension.  Allows you to request team membership data from a participating OpenID server and assign drupal roles based on the response"
+dependencies[] = openid
+configure = admin/config/services/openid_teams
+
+core = 7.x
+files[] = openid_teams.install
+files[] = openid_teams.module

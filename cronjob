@@ -1,0 +1,33 @@
+#!/bin/bash
+WEB=/srv/www.ubuntu-it.org
+WWW=$WEB/www/
+BZR=$WEB/bzr
+BZRWWW=$BZR/www
+
+function update_files {
+##Copy of all files
+cp -ax $BZRWWW/* $WWW/
+cp -ax $BZRWWW/.htaccess $WWW/
+}
+
+
+############################################ 
+##     Test if repo has been updated      ##
+############################################
+
+TMP_FILE=/tmp/wwwrepo_version ## Temp file where version bzr repo was saved
+
+## Create temp file if it doesn't exist
+if ! test -f $TMP_FILE ; then
+	cat /dev/null > $TMP_FILE
+fi
+
+cd $BZR
+VERSION=`cat $TMP_FILE`
+VERSION_TEST=`bzr up 2>&1 | tail -n1 `
+
+if [ ! "$VERSION_TEST" = "$VERSION" ] ; then 
+	echo "$VERSION_TEST" > $TMP_FILE
+	update_files
+fi
+

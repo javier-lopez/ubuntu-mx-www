@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function openid_test_menu() {
+  return array(
+    'teams/test/login' => array(
+      'title' => 'Mock login',
+      'page callback' => 'openid_test_login_with_teams',
+      'access arguments' => array('access content'),
+    ),
+  );
+}
+
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
+function openid_test_login_with_teams($teams) {
+  $op = 'user_register';
+  $response = array(
+    'openid.op_endpoint' => 'http://localhost/',
+    'openid.lp.is_member' => $teams,
+  );
+  openid_teams_openid_response($op, $response);
+  return "Requested teams {$teams}";
+}

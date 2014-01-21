@@ -1,0 +1,7 @@
+; $Id$
+name = Launchpad OpenID
+description = "Extends OpenID to use Launchpad as a single sign-on provider."
+dependencies[] = openid
+configure = admin/config/services/launchpad
+
+core = 7.x

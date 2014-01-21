@@ -1,0 +1,75 @@
+<?php
+
+// $Id$
+
+/**
+ * @file
+ * This file contains tests for responses.
+ */
+
+class DrupalTeamsResponseTestCase extends DrupalWebTestCase {
+  function getInfo() {
+    return array(
+      'name' => t('Teams response'),
+      'description' => t('Teams/openid response unit tests'),
+      'group' => t('OpenID Teams'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp('openid_test', 'openid_teams');
+  }
+
+  function tearDown() {
+    $this->drupalGet('user/logout');
+    variable_del('openid_teams_limit_to_known');
+    parent::tearDown();
+  }
+
+  public function testOpenidResponseLogsOutUserNotInTeamWithVariableSet() {
+    $this->runResponseTestForVariableStateAndTeam(true, 'team2');
+    $this->assertResponse(403, 'User has been logged out by mock registration call (not in team, ' .
+                          'variable set)');
+  }
+
+  public function testOpenidResponseAcceptsUserInTeamWithVariableSet() {
+    $this->runResponseTestForVariableStateAndTeam(true, 'team1');
+    $this->assertResponse(200, 'User is still logged in after mock registration call (in team, ' .
+                          'variable set)');
+  }
+
+  public function testOpenidResponseAcceptsUserNotInTeamWithVariableNotSet() {
+    $this->runResponseTestForVariableStateAndTeam(false, 'team2');
+    $this->assertResponse(200, 'User is still logged in after mock registration call (not in ' .
+                          'team, variable not set');
+  }
+
+  public function testOpenidResponseAcceptsUserInTeamWithVariableNotSet() {
+    $this->runResponseTestForVariableStateAndTeam(false, 'team1');
+    $this->assertResponse(200, 'User is still logged in after mock registration call (in team, ' .
+                          'variable not set)');
+  }
+
+  private function runResponseTestForVariableStateAndTeam($limit_to_known, $team) {
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query("INSERT INTO {openid_teams_roles} (tid, rid, sid, team) VALUES (1, 1, -1, 'team1')") */
+    $id = db_insert('openid_teams_roles')
+  ->fields(array(
+      'tid' => 1,
+      'rid' => 1,
+      'sid' => -1,
+      'team' => 'team1',
+    ))
+  ->execute();
+    $this->drupalGet('user/logout');
+    $user = $this->drupalCreateUser(array('access content'));
+    $this->drupalLogin($user);
+    variable_set('openid_teams_limit_to_known', $limit_to_known);
+    $content = $this->drupalGet("teams/test/login/{$team}");
+    $this->drupalGet("user/{$user->uid}");
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query('DELETE FROM {openid_teams_roles}') */
+    db_delete('openid_teams_roles')
+  ->execute();
+  }
+}

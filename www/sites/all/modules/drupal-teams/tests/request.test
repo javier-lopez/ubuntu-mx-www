@@ -1,0 +1,47 @@
+<?php
+
+// $Id$
+
+/**
+ * @file
+ * This file contains tests for requests.
+ */
+
+class DrupalTeamsRequestTestCase extends DrupalWebTestCase {
+  function getInfo() {
+    return array(
+      'name' => t('Teams request'),
+      'description' => t('Teams/openid request unit tests'),
+      'group' => t('OpenID Teams'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp('openid_teams');
+  }
+
+  function tearDown() {
+    parent::tearDown();
+  }
+
+  public function testExtensionReturned() {
+    $ext = module_invoke_all('openid', 'extension');
+    $result = array_search('lp', $ext);
+    $this->assertNotIdentical($result, FALSE, 'lp extension returned');
+  }
+
+  public function testTeamsAddedToRequest() {
+    $all_teams = array('team1', 'team2', 'team3');
+    $tid = 1;
+    foreach ($all_teams as $team) {
+      $rid = $this->_drupalCreateRole(array('access content'));
+      // TODO Please convert this statement to the D7 database API syntax.
+      db_query('INSERT INTO {openid_teams_roles} (tid, rid, sid, team) ' .
+               "VALUES (%d, %d, -1, '%s')", $tid++, $rid, $team);
+    }
+    $request = module_invoke_all('openid', 'request');
+    $result = $request['openid.lp.query_membership'];
+    $fixture = join(',', $all_teams);
+    $this->assertEqual($result, $fixture, 'Teams added to request');
+  }
+}

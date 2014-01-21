@@ -1,0 +1,405 @@
+/* $Id$ */
+
+/**
+ * Index:
+ * 1. Body
+ * 2. Header
+ * 3. Subheader
+ * 4. Content
+ * 5. Sidebar
+ * 6. Footer
+ * 7. Nice Menus
+ * 8. Advanced Forums
+ */
+
+
+/**
+ * 1. Body
+ */
+
+* {
+  font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
+}
+
+body {
+  font-size: 12px;
+  line-height: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  margin: 0 auto;
+  padding: 0;
+}
+
+/**
+ * 2. Header
+ */
+
+#header {
+  height: 70px;
+  margin: 0px;
+  padding: 0 5px;
+  position: relative;
+  font-size: 14px;
+}
+
+#header li {
+  float: left;
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+#header li a {
+  border-bottom: 0 none;
+  border-top: 0 none;
+  display: block;
+  float: left;
+  height: 70px;
+  line-height: 70px;
+  margin: 0;
+  padding: 0 15px;
+  text-decoration: none;
+}
+
+#header .block {
+  float: right;
+  margin: 20px 5px 0;
+}
+
+#header #search {
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  width: 150px;
+}
+
+#header #search * {
+  margin: 0;
+  padding: 0;
+  font-size: 10px !important;
+  font-weight: bold;
+  border: none;
+}
+
+#header #search .form-text {
+  padding: 2px 3px;
+}
+
+#header #search .form-submit {
+  cursor: pointer;
+  float: right;
+  padding: 5px 3px 0 1px;
+}
+
+#logo {
+  float: right;
+  margin: 11px 5px 0;
+}
+
+/**
+ * 3. Subheader
+ */
+
+#subheader {
+  height: 40px;
+}
+
+#subheader .container {
+  position: relative;
+  margin: 0 auto;
+  padding: 0 0 10px;
+}
+
+#subheader .container-inside {
+  width: 96%;
+  margin: 0 auto;
+  height: 39px;
+  position: relative;
+  border-radius: 0px 0px 8px 8px;
+  -moz-border-radius: 0px 0px 8px 8px;
+  -webkit-border-radius: 0px 0px 8px 8px;
+}
+
+#subheader .block {
+  float: left;
+  display: block;
+}
+
+#subheader .links {
+  float: left;
+  display: block;
+  padding: 0 10px;
+}
+
+#subheader .links li {
+  padding: 0;
+}
+
+#subheader .links a {
+  float: left;
+  padding: 0 15px;
+  margin: 0;
+  line-height: 40px;
+  text-decoration: none;
+}
+
+#subheader h2 {
+  display: none;
+}
+
+#subheader .form-submit {
+  height: 24px;
+  margin: 7px 9px 7px 0;
+  padding: 2px;
+}
+
+#subheader .form-text {
+  height: 16px;
+  margin: 7px 9px 7px 0;
+  padding: 3px;
+  width: 180px;
+}
+
+#subheader .form-text:focus {
+}
+
+#subheader .block-search {
+  float: right;
+}
+
+/* launchpad login */
+#subheader #openid-launchpad-login-form input {
+  border: none;
+  height: 20px;
+  padding-left: 22px;
+  cursor: pointer;
+}
+
+/**
+ * 4. Content
+ */
+
+#content {
+  line-height: 1.4em;
+  overflow: hidden;
+}
+
+#content .container {
+  margin-top: -9px;
+  padding: 20px 0;
+  overflow: hidden;
+}
+
+#page-content {
+  display: inline-block;
+  width: 100%;
+}
+
+#content .primary {
+  margin: 5px 0 0 0;
+}
+
+#content .primary a {
+  padding-top: 2px;
+  border-radius: 6px 6px 0px 0px;
+  -moz-border-radius: 6px 6px 0px 0px;
+  -webkit-border-radius: 6px 8px 0px 0px;
+}
+
+#content .block, .messages, .status {
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 34px;
+  font-weight: normal;
+  line-height: 36px;
+  margin: 6px 0 0 0;
+}
+
+#center {
+  overflow: hidden;
+}
+
+.submitted {
+  font-size: 11px;
+  margin: 0 0 0 5px;
+}
+
+.node {
+  padding: 4px 2px 8px 2px;
+}
+
+.comment h3 {
+  margin: 0 15px 0 0;
+  float: left;
+}
+
+.comment h3 a {
+  text-decoration: none;
+}
+
+.comment {
+  padding: 3px 8px 5px 8px;
+}
+
+.new {
+  float: right;
+}
+
+.node .links a, .comment .links a {
+  font-size: 11px;
+}
+
+.forum-topic-navigation {
+  height: 1.5em;
+}
+
+input, select {
+  vertical-align: middle;
+}
+
+.messages, .status {
+  font-size: 14px;
+  margin: 0 10px !important;
+}
+
+/**
+ * 5. Sidebar
+ */
+
+.sidebar .block {
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+
+.sidebar-right {
+  padding: 0 10px;
+}
+
+.sidebar-left {
+  padding: 0 10px;
+}
+
+.sidebars {
+  margin: 0 200px 0 200px;
+  padding: 0 10px;
+}
+
+.sidebar {
+  width: 200px;
+}
+
+.sidebar .block {
+  width: 170px !important;
+}
+
+#sidebar-right {
+  float: right;
+  padding: 10px;
+}
+
+#sidebar-left {
+  float: left;
+  padding: 10px;
+}
+
+.sidebar .menu {
+  padding: 0 0 0 15px !important;
+}
+
+.sidebar .block ul {
+  padding: 0;
+}
+
+.sidebar .menu li {
+  padding: 0;
+  margin: 0;
+  line-height: 1.2em;
+}
+
+.sidebar .menu a {
+  margin: 0 0 0 -4px;
+}
+
+.sidebar #user-login-form ul, .sidebar #user-login-form li {
+  padding: 0; margin: 0;
+  list-style-type:none;
+}
+
+/**
+ * 6. Footer
+ */
+
+#footer {
+  font-size: 11px;
+  width: 100%;
+  display: table;
+}
+
+#footer .block {
+  float: left;
+  margin: 5px 10px;
+  padding: 10px;
+  width: 120px;
+
+}
+
+#footer .block .content a {
+  display: block;
+  text-decoration: none;
+}
+
+/**
+ * 7. Nice Menus
+ */
+
+/* Reset Nice Menu CSS */
+
+ul.nice-menu, ul.nice-menu a, ul.nice-menu ul, ul.nice-menu li, ul.nice-menu-down,
+ul.nice-menu-down ul, ul.nice-menu-down li, ul.nice-menu li.menuparent,
+ul.nice-menu li.menuparent a, ul.nice-menu li.menuparent a:hover,
+ul.nice-menu li.menuparent:hover, ul.nice-menu li.menuparent:hover a {
+  border: 0;
+  padding:0;
+  margin: 0;
+}
+
+ul.nice-menu, ul.nice-menu ul {
+  position: absolute;
+}
+
+#header ul.nice-menu li ul {
+  margin-top: 44.8px;
+  margin-left: 0px;
+}
+
+#header ul.nice-menu li ul li {
+  height: 20px;
+  min-width: 100%;
+  width: 100%;
+  white-space: nowrap;
+}
+
+#header ul.nice-menu li ul li a {
+  height: 20px;
+  line-height: 20px;
+  width: 100%;
+  padding: 0 0 0 10px;
+}
+
+/**
+ * 8. Advanced Forums
+ */
+ 
+ 
+ 
+
+
+
+/* end of classes ubuntu.com */
+

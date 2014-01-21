@@ -1,0 +1,84 @@
+/* 
+ * Get Ubuntu Desktop Edition
+ */
+ 
+.panel-pane .grid-12 .pane-content h2 {
+  margin-top: 8px;
+  margin-bottom: 12px;
+  margin-right: 6px;
+}
+
+div.panel-pane div.pane-content button.download:active, div.panel-pane div.pane-content button.download.active,
+div.panel-pane div.pane-content button.download:hover, div.panel-pane div.pane-content button.download.hover {
+    background: url("../images/btn-download-active-bg.png") no-repeat scroll 0 0 #962D0C;
+    color: #AEA79F !important;
+    cursor: pointer;
+    text-shadow: 0 1px #333333;
+}
+
+div.panel-pane div.pane-content button.download {
+    background: url("../images/btn-download-bg.png") no-repeat scroll 0 0 #DD4814;
+    border: 0 none;
+    border-radius: 4px 4px 4px 4px;
+    -webkit-border-radius: 4px 4px 4px 4px;
+    -moz-border-radius: 4px 4px 4px 4px;
+    color: #FFFFFF;
+    height: 128px;
+    margin: 16px 0 8px;
+    text-align: center;
+    text-shadow: 0 1px #333333;
+    vertical-align: middle;
+    width: 100%;
+    border: none;
+}
+
+div.panel-pane div.pane-content button.download * {
+    color:#FFFFFF !important;
+}
+
+div.panel-pane div.pane-content button.download h2 {
+    margin: 5px 0 10px !important;
+}
+
+div.panels-flexible-region-11-opzioni h2 {
+    margin: 16px 0 19px !important;
+}
+
+div.panel-pane div.pane-content button.download {
+
+}
+
+.grid-12 h6 {
+	font-weight: bold;
+	font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
+}
+
+ #prova p {
+  font-family: "Ubuntu Beta", UbuntuBeta, Ubuntu, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  margin: 0px;
+  padding: 0px;
+  color: #333333;
+}
+
+#download-note {
+    border: 1px solid #F7F7F7;
+    border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    font-size: 16px;
+    line-height: 22px;
+    margin-right: 27px;
+    padding: 10px 10px 12px;
+}
+
+#distroval {
+    text-transform: capitalize;
+}
+
+#version:disabled {
+    color: #999999;
+}
+
+/* end of Get Ubuntu Desktop Edition */

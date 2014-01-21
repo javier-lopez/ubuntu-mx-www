@@ -1,0 +1,75 @@
+/* Stylesheet for comments */
+
+#comments {
+    border-top: 6px solid #F0F0F0;
+}
+
+#comments .box h2 {
+    line-height: 20px;
+    font-size: 16px;
+}
+
+.comment {
+    border-radius: 3px;
+    padding: 4px 8px;
+    background: #F0F0F0;
+    margin-bottom: 8px;
+    border: solid 1px #E9E9E9;
+    box-shadow: 0 1px 1px white inset;
+}
+
+.comment * {
+    text-shadow: 0 1px 1px #fdfdfd;
+}
+
+.indented {
+    margin-left: 40px;
+}
+
+.comment .picture {
+    float: left;
+}
+
+.comment .picture img {
+    max-width: 32px;
+    border: solid 1px #E9E9E9;
+    box-shadow: 0 1px 1px #afafaf;
+}
+
+.comment .content {
+    margin-left: 44px;
+    margin-top: 0 !important;
+}
+
+.comment .comment-author, .comment .comment-author * {
+    font-size: 11px;
+    color: #555;
+}
+
+.comment .comment-author span {
+    padding: 0 5px;
+}
+
+.comment .comment-author span.date {
+    padding-left: 0;
+}
+
+.comment ul.links {
+    float: right;
+    border: 1px solid white;
+    border-radius: 10px;
+    background: whiteSmoke;
+    line-height: 16px;
+    box-shadow: 0 1px 1px #dfdfdf inset;
+}
+
+.comment-unpublished {
+    background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+    background-image: -moz--linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+    background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+    background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+    background-image: linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+    background-color: #d6d6d6;
+    background-size: 30px 30px;
+    border-color: #d6d6d6;
+}

@@ -1,0 +1,38 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * This file contains the installation processes for the openid-launchpad module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function openid_launchpad_install() {
+  include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'openid_launchpad')
+    . '/openid_launchpad.module';
+  // Restrict openid logins to launchpad
+  variable_set('openid_idp_policy', 'protected');
+  variable_set('openid_launchpad_server', LAUNCHPAD_PRODUCTION_URL);
+  variable_set('openid_idp_allow', LAUNCHPAD_PRODUCTION_OP);
+
+  // Configure defaults
+  // 'My Account' page enabled
+  variable_set('openid_launchpad_hide_account', FALSE);
+  // user/register and user/password disabled
+  variable_set('openid_launchpad_prevent_register', TRUE);
+  // username and email syncronisation on login enabled
+  variable_set('openid_launchpad_sync_user', TRUE);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function openid_launchpad_uninstall() {
+  variable_del('openid_launchpad_server');
+  variable_del('openid_launchpad_hide_account');
+  variable_del('openid_launchpad_prevent_register');
+  variable_del('openid_launchpad_sync_user');
+}
+

@@ -1,0 +1,83 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * This file contains the processes to install the openid-teams module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function openid_teams_schema() {
+  $schema['openid_teams_roles'] = array(
+    'description' => 'TODO',
+    'fields' => array(
+      'tid' => array(
+        'description' => 'TODO',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'rid' => array(
+        'description' => 'TODO',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'sid' => array(
+        'description' => 'TODO',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'team' => array(
+        'description' => 'TODO',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('tid'),
+  );
+
+  $schema['openid_teams_trusted'] = array(
+    'description' => 'TODO',
+    'fields' => array(
+      'sid' => array(
+        'description' => 'TODO',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'server' => array(
+        'description' => 'TODO',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('sid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function openid_teams_install() {
+  // Create tables.
+  // TODO The drupal_(un)install_schema functions are called automatically in D7.
+  // drupal_install_schema('openid_teams')
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function openid_teams_uninstall() {
+  // Remove tables.
+  // TODO The drupal_(un)install_schema functions are called automatically in D7.
+  // drupal_uninstall_schema('openid_teams')
+
+  variable_del('openid_teams_limit_to_known');
+}
+

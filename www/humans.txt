@@ -1,0 +1,17 @@
+/* Website */
+
+Il sito web e' gestito dal Gruppo Web: http://wiki.ubuntu-it.org/GruppoWeb
+Se vuoi dare una mano a mantere il sito, dai un'occhiata a http://forum.ubuntu-it.org/viewtopic.php?f=45&t=519721
+
+/* TEAM */
+
+Dario Cavedon (ic3d) - Amministratore - Zane', Vicenza, Italia
+Riccardo Padovani (WebbyIT) - Amministratore - Ferrara, Italia
+Leo Iannacone (l3on) - Bologna, Italia
+Silvia Bindelli (Dolasilla) - Antibes, Francia
+Mirko Pizii (hallino1) - Bellante Stazione, Teramo, Italia
+Pietro Albini (pietro98-albini) - Rimini, Italia
+Mattia Migliorini (deshack) - Dueville, Vicenza, Italia
+Emanuele Boncimino (emaxxim) - Palermo, Italia
+Paolo Rotolo (PaoloRotolo) - Bari, Italia
+Luca Lazzarini (lzzluca) - Londra, Regno Unito

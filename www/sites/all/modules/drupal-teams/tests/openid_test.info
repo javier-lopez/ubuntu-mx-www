@@ -1,0 +1,14 @@
+; $Id$
+name = "OpenID Test"
+description = "Support module for OpenID Teams tests"
+package = Testing
+version = VERSION
+core = 7.x
+
+hidden = TRUE
+files[] = module.test
+files[] = openid_test.module
+files[] = request.test
+files[] = response.test
+files[] = roles.test
+files[] = openid_test/admin.test

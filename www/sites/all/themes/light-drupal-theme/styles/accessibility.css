@@ -1,0 +1,20 @@
+/* This file contains css rules for accessibility */
+
+body, html {
+  background-color: #666;
+}
+
+#header, #subheader .container-inside { 
+  box-shadow: 0 1px 3px #444444;
+}
+
+#header .buttons #accessibility {
+  background-position: bottom;
+}
+
+/*#footer .container *, #footer .container p, #footer a:hover, */
+.force-accessibility * , .accessibility {
+  color: #FFFFFF;
+  text-shadow:none;
+}
+

@@ -1,0 +1,228 @@
+<?php
+
+// $Id$
+
+/**
+ * @file
+ * This file contains tests for the module.
+ */
+
+class DrupalTeamsTestCase extends DrupalWebTestCase {
+  private $all_tids = array();
+  private $all_rids = array(1, 2, 1, 2);
+  private $all_sids = array();
+  private $all_teams = array('team1', 'team2', 'team2', 'team3');
+  private $all_servers = array(
+    NULL,
+    'http://localhost/test/',
+    'http://localhost/test/',
+    'http://*.example.com/',
+  );
+  private $rids_matched_by_servers = array(
+    array(
+      'server' => 'http://localhost/test/',
+      'assigned_team' => 'team2',
+      'fixture_rids' => array(1, 2),
+      'fixture_tids_index' => array(1, 2),
+    ),
+    array(
+      'server' => 'http://*.example.com/',
+      'assigned_team' => 'team3',
+      'fixture_rids' => array(2),
+      'fixture_tids_index' => array(2),
+    ),
+  );
+
+  function getInfo() {
+    return array(
+      'name' => t('Teams'),
+      'description' => t('Teams/openid unit tests'),
+      'group' => t('OpenID Teams'),
+    );
+  }
+
+  function testAddsFieldToUserAdminSettingsForm() {
+    $form = $form_state = array();
+    $form_id = 'user_admin_settings';
+    openid_teams_form_alter($form, $form_state, $form_id);
+    $this->assertTrue(is_array($form['openid']['openid_teams_limit_to_known']));
+  }
+
+  function testIgnoresNonUserAdminSettingsForm() {
+    $form = $form_state = array();
+    $form_id = 'some_other_form';
+    openid_teams_form_alter($form, $form_state, $form_id);
+    $this->assertTrue(sizeof(array_keys($form)) == 0);
+  }
+
+  function testHandlesUserAdminSettingsSubmit() {
+    variable_del('openid_teams_limit_to_known');
+    $form = array();
+    $form_values = array(
+      'values' => array(
+        'form_id' => 'user_admin_settings',
+        'openid_teams_limit_to_known' => TRUE,
+      ),
+    );
+    openid_teams_form_submit($form, $form_values);
+    $this->assertTrue(variable_get('openid_teams_limit_to_known', FALSE));
+  }
+
+  function testHandlesUserAdminSettingsSubmitNotSet() {
+    variable_del('openid_teams_limit_to_known');
+    $form = array();
+    $form_values = array(
+      'values' => array(
+        'form_id' => 'user_admin_settings',
+      ),
+    );
+    openid_teams_form_submit($form, $form_values);
+    $this->assertFalse(variable_get('openid_teams_limit_to_known', TRUE));
+  }
+
+  function testGetCurrentTeams() {
+    $result = sort(get_current_teams());
+    $fixture = sort(array_unique($this->all_teams));
+    $this->assertEqual($result, $fixture);
+  }
+
+  function testGetRolesTeamsMap() {
+    $result = get_roles_teams_map();
+    $fixture = array_combine($this->all_tids, $this->all_rids);
+    $this->assertEqual($result, $fixture);
+  }
+
+  function testGetTeamsRolesMap() {
+    $result = get_teams_roles_map();
+    $fixture = array();
+    for ($i = 0; $i < sizeof($this->all_teams); $i++) {
+      $team = $this->all_teams[$i];
+      $rid = $this->all_rids[$i];
+      if (!array_key_exists($team, $fixture)) {
+        $fixture[$team] = array();
+      }
+      $fixture[$team][] = $rid;
+    }
+    $this->assertEqual($result, $fixture);
+  }
+
+  function testGetTeamRoleIds() {
+    foreach ($this->rids_matched_by_servers as $test_case) {
+      $team = $test_case['assigned_team'];
+      $server = $test_case['server'];
+      $result = sort(get_team_role_ids($team, $server));
+      $fixture = sort($test_case['fixture_rids']);
+      $this->assertEqual($result, $fixture);
+    }
+  }
+
+  function testGetApprovedTeamMappingsWithArray() {
+    foreach ($this->rids_matched_by_servers as $test_case) {
+      $teams = array('no-team1', $test_case['assigned_team'], 'no-team2');
+      $server = $test_case['server'];
+      $result = sort(get_approved_team_mappings($teams, $server));
+      $fixture = sort($this->getTidsWithIndexes($test_case['fixture_tids_index']));
+      $this->assertEqual($result, $fixture);
+    }
+  }
+
+  function testGetApprovedTeamMappingsWithString() {
+    foreach ($this->rids_matched_by_servers as $test_case) {
+      $teams = "no-team1,no-team2,{$test_case['assigned_team']}";
+      $server = $test_case['server'];
+      $result = get_approved_team_mappings($teams, $server);
+      $fixture = sort($this->getTidsWithIndexes($test_case['fixture_tids_index']));
+      $this->assertEqual($result, $fixture);
+    }
+  }
+
+  function testGetApprovedTeamMappingsWithStringSingleTeam() {
+    foreach ($this->rids_matched_by_servers as $test_case) {
+      $teams = $test_case['assigned_team'];
+      $server = $test_case['server'];
+      $result = get_approved_team_mappings($teams, $server);
+      $fixture = sort($this->getTidsWithIndexes($test_case['fixture_tids_index']));
+      $this->assertEqual($result, $fixture);
+    }
+  }
+
+  private function getTidsWithIndexes($all_indexes) {
+    $tids = array();
+    foreach ($all_indexes as $index) {
+      $tids[] = $this->all_tids[$index];
+    }
+    return $tids;
+  }
+
+  function testOpenidTeamsGetTrustedListWithoutAllServers() {
+    $result = openid_teams_get_trusted_list();
+    $fixture = $this->getUniqueTrustedServersCount();
+    $this->assertEqual(sizeof($result), $fixture, sprintf('Expected %d, got %d', $fixture, sizeof($result)));
+  }
+
+  function testOpenidTeamsGetTrustedListWithAllServers() {
+    $result = openid_teams_get_trusted_list(TRUE);
+    $fixture = $this->getUniqueTrustedServersCount() + 1;
+    $this->assertEqual(sizeof($result), $fixture, sprintf('Expected %d, got %d', $fixture, sizeof($result)));
+  }
+
+  function getUniqueTrustedServersCount() {
+    $non_NULL_servers = array();
+    foreach ($this->all_servers as $server) {
+      if ($server) {
+        $non_NULL_servers[] = $server;
+      }
+    }
+    return sizeof(array_unique($non_NULL_servers));
+  }
+
+  function setUp() {
+    parent::setUp('openid', 'openid_launchpad', 'openid_teams');
+    $this->setupTrustedServersData();
+    $this->setupTeamsRolesData();
+  }
+
+  function setupTrustedServersData() {
+    $servers_added = array();
+    $sid = 1;
+    for ($i = 0; $i < sizeof($this->all_servers); $i++) {
+      $server = $this->all_servers[$i];
+      if ($server != NULL) {
+        if (!in_array($server, $servers_added)) {
+          // TODO Please review the conversion of this statement to the D7 database API syntax.
+          /* db_query("INSERT INTO {openid_teams_trusted} (sid, server) VALUES (%d, '%s')", $sid++, $server) */
+          $id = db_insert('openid_teams_trusted')
+  ->fields(array(
+            'sid' => $sid++,
+            'server' => $server,
+          ))
+  ->execute();
+          $servers_added[] = $server;
+        }
+        $this->all_sids[] = $sid;
+      }
+    }
+  }
+
+  function setupTeamsRolesData() {
+    for ($i = 0; $i < sizeof($this->all_teams); $i++) {
+      $tid = $i + 1;
+      $this->all_tids[$i] = $tid;
+      $rid = $this->all_rids[$i];
+      $sid = $this->all_sids[$i];
+      $team = $this->all_teams[$i];
+      // TODO Please convert this statement to the D7 database API syntax.
+      db_query('INSERT INTO {openid_teams_roles} (tid, rid, sid, team) ' .
+               "VALUES (%d, %d, %d, '%s')", $tid, $rid, $sid, $team);
+    }
+  }
+
+  function tearDown() {
+    parent::tearDown();
+    // TODO Please review the conversion of this statement to the D7 database API syntax.
+    /* db_query('DELETE FROM {openid_teams_roles}') */
+    db_delete('openid_teams_roles')
+  ->execute();
+    variable_del('openid_teams_limit_to_known');
+  }
+}
