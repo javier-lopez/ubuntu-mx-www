@@ -15,21 +15,25 @@ Note: The deployment has been optimized to work on Ubuntu 12.04 servers
 
 1. Ensure you've root permitions through sudo
 
-2. Run (an answer the root question):
+2. Run the deployment script (an answer the root question):
 
    ```
-   $ sh <(wget -qO- github-url/ubuntu-mx-www/deploy)
+   $ sh <(wget -qO- https://raw2.github.com/chilicuil/ubuntu-mx-www/master/deploy)
    ```
 
-2. Configure the ...:
-
-
-   ```
-   $ step 2
-   ```
-
-3. Reboot services:
+3. Finish the installation using a browser (follow the instructions displayed by the script):
 
    ```
-   $ step 3
+   - choose the language (english,spanish)
+   - add the db settings (the script will generate and output the required parameters)
+   - create the admin credentials and finish the installation
    ```
+
+4. Enable the Ubuntu theme:
+
+   ```
+   - Visit /appearance
+   - Choosing Ubuntu-it Drupal Theme
+   ```
+
+5. Create content
