@@ -535,8 +535,8 @@ _deploy()
         _cmd chmod +x $(basename "$updates")
         _cmdsudo mv $(basename "$updates") /usr/local/bin/
         _cmdsudo sed \\\"/deploy/d\\\" /etc/crontab
-        deploy_var_crontab="*/5 \* \* \* \* root /usr/local/bin/deploy"
-        _cmdsudo sed -i -e \\\"\$ a$deploy_var_crontab\\\" /etc/crontab
+        #deploy_var_crontab="*/5 \* \* \* \* root /usr/local/bin/deploy"
+        #_cmdsudo sed -i -e \\\"\$ a$deploy_var_crontab\\\" /etc/crontab
     fi
 
     ############################################################################
