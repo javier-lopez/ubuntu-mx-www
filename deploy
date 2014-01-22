@@ -425,27 +425,29 @@ _deploy()
     #crontab rutine
     if [ -d "$web"/sites/default ]; then
         if [ "$(id -u)" != "0" ]; then
-            printf "%s\\n%s\\n" "crontab: update_deploy failed, not root" \
+            printf "%s\\n%s\\n" "crontab: update_deploy failed, not root ($(id -u))" \
                 "unable to update /var/www" > "$errorfile"
             exit
         fi
+        
+        localsite=$(basename "$site")
 
-        if [ -d "$gitweb"/git-"$site" ]; then
-            cd "$gitweb"/git-"$site"
+        if [ -d "$gitweb"/git-"$localsite" ]; then
+            cd "$gitweb"/git-"$localsite"
             git pull
             cd -
         else
-            git clone --depth=1 "$site.git" "$gitweb"/git-"$site"
+            git clone --depth=1 "$site.git" "$gitweb"/git-"$localsite"
         fi
 
         if [ ! -f "$web"/not_override ]; then
-            for _deploy_var_file in "$gitweb"/git-"$site"/www/*; do
+            for _deploy_var_file in "$gitweb"/git-"$localsite"/www/*; do
                 [ ! -e "$_deploy_var_file" ] && continue
                 _smv "$_deploy_var_file" "$web"
             done
-            [ ! -d "$gitweb"/old-"$site" ] && mkdir "$gitweb"/old-"$site"
-            mv "$web"/*.old "$gitweb"/old-"$site"
-            find "$gitweb"/old-"$site"/ -mindepth 1 -maxdepth 1 \
+            [ ! -d "$gitweb"/old-"$localsite" ] && mkdir "$gitweb"/old-"$localsite"
+            mv "$web"/*.old "$gitweb"/old-"$localsite"
+            find "$gitweb"/old-"$localsite"/ -mindepth 1 -maxdepth 1 \
                 -mtime +60 -exec rm -rf {} \;
         fi
         exit
@@ -480,7 +482,12 @@ _deploy()
     [ ! -d "$gitweb" ] && _cmdsudo mkdir "$gitweb"
     [ ! -d "$web" ]    && _cmdsudo mkdir "$web"
 
-    if [ ! -d "$gitweb"/git-"$site" ]; then
+    #tmp
+    #_cmd wget http://f.javier.io/rep/ubuntu-mx-www.tar.bz2
+    #_cmd tar jxf ubuntu-mx-www.tar.bz2
+    #_cmdsudo mv ubuntu-mx-www "$gitweb"/git-"$localsite"
+
+    if [ ! -d "$gitweb"/git-"$localsite" ]; then
         _fetchrepo "$site.git" "$gitweb"/git-"$localsite"
     else
         cd "$gitweb"/git-"$localsite"
@@ -495,6 +502,8 @@ _deploy()
         [ ! -e "$_deploy_var_file" ] && continue
         _cmdsudo cp -r "$_deploy_var_file" "$web"
     done
+
+    _cmdsudo cp -r "$gitweb"/git-"$localsite"/www/.htaccess "$web"
 
     ############################################################################
 
