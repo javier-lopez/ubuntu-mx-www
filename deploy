@@ -11,7 +11,7 @@ errorfile="/tmp/deploy.$$.error"
 #default apps
 apps_install="git-core apache2 php5 libapache2-mod-php5 php5-mcrypt php5-pgsql
 php5-suhosin php5-gd libgd2-xpm libjpeg-turbo8 libjpeg8 mysql-server mysql-client
-php5-mysql php5-curl php5-json"
+php5-mysql php5-curl php5-json php5-dev php-pear"
 
 ##################
 #general functions
@@ -475,6 +475,7 @@ _deploy()
     _printfs "installing deps ..."
     _waitforsudo apt-get update
     _waitforsudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y $apps_install
+    _waitforsudo pecl install uploadprogress
 
     if ! command -v "git" >/dev/null; then
         _die "Dependency step failed"
@@ -525,6 +526,8 @@ _deploy()
     _cmdsudo a2enmod headers
     _cmdsudo sed -i -e \\\"/AllowOverride/ \
         s:.*:AllowOverride All:\\\" /etc/apache2/sites-available/default
+    echo "extension=uploadprogress.so" > uploadprogress.ini
+    _cmdsudo mv uploadprogress.ini /etc/php5/conf.d/
     _cmdsudo service apache2 restart
     _cmdsudo chown -R www-data.www-data /var/www/
 
