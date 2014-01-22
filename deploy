@@ -261,11 +261,10 @@ _smv()
     if [ X"$_smv_var_owner" != X"$LOGNAME" ]; then
         #if target has a file with the same name as origin
         if [ -e "$2"/"$_smv_var_origin_basename" ]; then
-            printf "%s\\n" "$sudopwd" | \ $sudocmd mv "$2"/"$_smv_var_origin_basename" \
+            printf "%s\\n" "$sudopwd" | $sudocmd mv "$2"/"$_smv_var_origin_basename" \
                 "$2"/"$_smv_var_origin_basename".old."$_smv_var_version" \
                 >/dev/null 2>&1
-            printf "%s\\n" "$sudopwd" | \
-                $sudocmd chown -R "$_smv_var_owner" \
+            printf "%s\\n" "$sudopwd" | $sudocmd chown -R "$_smv_var_owner" \
                 "$2"/"$_smv_var_origin_basename".old."$_smv_var_version" \
                 >/dev/null 2>&1
         fi
@@ -443,10 +442,17 @@ _deploy()
         if [ ! -f "$web"/not_override ]; then
             for _deploy_var_file in "$gitweb"/git-"$localsite"/www/*; do
                 [ ! -e "$_deploy_var_file" ] && continue
+                case $(basename "$_deploy_var_file") in
+                    sites) continue ;;
+                esac
                 _smv "$_deploy_var_file" "$web"
             done
+            _smv "$gitweb"/git-"$localsite"/www/.htaccess "$web"
             [ ! -d "$gitweb"/old-"$localsite" ] && mkdir "$gitweb"/old-"$localsite"
-            mv "$web"/*.old "$gitweb"/old-"$localsite"
+            for _deploy_var_file in "$web"/*.old*; do
+                [ ! -e "$_deploy_var_file" ] && continue
+                mv "$_deploy_var_file" "$gitweb"/old-"$localsite"/
+            done
             find "$gitweb"/old-"$localsite"/ -mindepth 1 -maxdepth 1 \
                 -mtime +60 -exec rm -rf {} \;
         fi
