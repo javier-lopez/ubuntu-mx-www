@@ -1,0 +1,56 @@
+/* Stylesheet for 404 page */
+
+#error-handler #title {
+    background: url("../images/header_error_large_ubuntu.png") no-repeat scroll 0 0 transparent;
+    height: 200px;
+    margin-left: -16px;
+    padding-top: 50px;
+}
+
+#error-handler #title h1 {
+    color: #FFFFFF;
+    margin-left: 34px;
+    margin-top: 16px;
+    position: absolute;
+}
+
+#error-handler #title h2,
+#error-handler #title h3 {
+    margin-left: 200px;
+}
+
+#error-handler .info {
+    background-color: #F7F7F7;
+    background-position: right bottom;
+    background-repeat: no-repeat;
+    border: 1px solid #F0F0F0;
+    border-radius: 6px 6px 6px 6px;
+    -moz-border-radius: 6px 6px 6px 6px;
+    -webkit-border-radius: 6px 6px 6px 6px;
+    min-height: 192px;
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+#error-handler .info h3 {
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+#error-handler .info p {
+  font-size: 14px;
+  line-height: 18px;
+  width: 188px;
+}
+
+#error-handler #progetto {
+  background-image: url("/sites/default/files/pictograms/knowledge_orange_hex.png");
+}
+
+#error-handler #download {
+  background-image: url("/sites/default/files/pictograms/download_orange_hex.png");
+}
+
+#error-handler #contatti {
+  background-image: url("/sites/default/files/pictograms/email_orange_hex.png");
+}

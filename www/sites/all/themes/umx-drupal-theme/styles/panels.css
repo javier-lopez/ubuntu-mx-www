@@ -1,0 +1,133 @@
+/* Stylesheet per pagine di tipo panel */
+
+#pane-presentation-comunita,
+#pane-presentation-progetto {
+    width: 487px;
+}
+
+
+/* start supporto */
+
+#supporto img.support_community {
+    margin-top: -50px;
+}
+
+#supporto .community_support .pane-content  {
+    background: none repeat scroll 0 0 #F7F7F7;
+    border: 1px solid #F0F0F0;
+    border-radius: 4px 4px 4px 4px;
+    min-height: 160px;
+    padding: 0 10px;
+    text-align: justify;
+}
+
+#supporto .community_support .pane-content:hover {
+    border: 1px solid transparent;
+    background: #f4f4f4;
+}
+
+#supporto .community_support .pane-content h3 {
+    margin: 12px 0;
+}
+
+/* end supporto */
+
+
+/* start progetto */
+
+#progetto .percheusareubuntu .pane-content p {
+  border: 1px solid #F0F0F0;
+  padding: 10px 10px 12px;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  font-size: 14px;
+  line-height: 22px;
+  float: left;
+  width: 250px;
+  height: 128px;
+  margin: 19px;
+  background: #F4F4F4;
+}
+
+#progetto .percheusareubuntu .pane-content img {
+  float: right;
+  height: 60px;
+  margin-top: -4px;
+  margin-left: 20px;
+}
+
+#progetto #promessa {
+    background: none repeat scroll 0 0 #FAFAFA;
+    border: 1px solid #F7F7F7;
+    border-radius: 8px 8px 8px 8px;
+    -moz-border-radius: 8px 8px 8px 8px;
+    -webkit-border-radius: 8px 8px 8px 8px;
+    margin: 8px 5px 5px;
+    padding-bottom: 14px;
+    padding-top: 10px;
+    text-align: center;
+}
+
+#progetto #promessa h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    margin-top: 5px;
+}
+
+#progetto #promessa p {
+    margin: 12px 0 0 0
+}
+
+#progetto #promessa span {
+   color: #111111;
+    font-weight: bold;
+}
+
+/* end progetto */
+
+/* start scopri-ubuntu */
+
+#scopri-ubuntu .server-img-aziende ul {
+    margin-left: 10px;
+    margin-right: 0;
+    margin-top: -5px;
+    padding: 0;
+}
+
+#scopri-ubuntu .server-img-aziende li {
+    border-right: 1px dotted #DFDCD9;
+    display: inline;
+    list-style: none outside none;
+    margin-right: 15px;
+    padding-right: 18px;
+}
+
+#scopri-ubuntu .server-img-aziende img {
+  margin-left: 3px;
+}
+
+#scopri-ubuntu #server-img-prev img {
+  margin-top: -55px;
+}
+
+/* end scopri-ubuntu */
+
+
+/* start comunita */
+
+#comunita_slides {
+    background: none repeat scroll 0 0 #F7F7F7;
+    border: 1px solid #F0F0F0;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    display:none;
+}
+
+.comunita_slide {
+    display:none;
+    padding: 10px 10px 12px;
+}
+
+/* end comunita */

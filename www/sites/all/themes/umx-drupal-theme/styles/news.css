@@ -1,0 +1,236 @@
+/* Stylesheet for news page */
+
+#news, 
+div#center .view-taxonomy-term,
+div#center .news-archive
+{
+  margin: 0 10px;
+}
+
+#news .page-description {
+  background:none;
+  width:482px;
+}
+
+#news .page-description-img {
+  margin-top: -13px;
+}
+
+#news h2,
+#center .view-taxonomy-term .view-content .node h2,
+#center .news-archive .view-content .node h2
+{
+  margin: 0px !important;
+  text-shadow: none;
+  line-height: 16px !important;
+}
+
+
+
+#news h2 a, 
+#center .view-taxonomy-term .view-content .node h2 a,
+#center .news-archive .view-content .node h2 a
+{
+  font-size: 18px !important;
+  line-height: 28px !important;
+  background: url("../images/see-news.png") no-repeat scroll right 8px transparent;
+  color: #333;
+  display: inline-block;
+  padding-right: 14px;
+  text-shadow: none;
+  text-decoration:none;
+  margin: 0;
+}
+
+#news h2 a:hover,
+#center .view-taxonomy-term .view-content .node h2 a:hover,
+#center .news-archive .view-content .node h2 a:hover
+{
+  text-decoration:underline;
+}
+
+#news .meta {
+  
+}
+
+#news .submitted,
+#center .view-taxonomy-term .submitted,
+#center .news-archive .submitted
+{
+  font-size:10px;
+  line-height: 10px;
+  margin-top: 5px;
+}
+
+#news .submitted a,
+#center .view-taxonomy-term .submitted a,
+#center .news-archive .submitted a 
+{
+  color: #444444;
+  font-size: 10px;
+}
+
+#news .item-list .pager {
+  margin: 10px;
+}
+
+#news #news-list , 
+#center .view-taxonomy-term .view-content,
+#center .news-archive .view-content
+{
+  background: none repeat scroll 0 0 #fafafa;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border: 1px solid #ececec;
+}
+
+#news .node, 
+#center .view-taxonomy-term .view-content .node,
+#center .news-archive .view-content .node
+{
+  border-bottom: #f0f0f0 1px solid;
+  border-top: #fafafa 1px solid;
+  padding:10px 16px 6px;
+}
+#news .node:hover, 
+#center .view-taxonomy-term .view-content .node:hover,
+#center .news-archive .view-content .node:hover
+{
+/*  background: url("../images/see-news.png") no-repeat scroll right center #f4f4f4;*/
+  background: #f4f4f4;
+}
+
+#news .node:first-child,
+#center .view-taxonomy-term .views-row-first .node,
+#center .news-archive .views-row-first .node
+{
+  border-top: none;
+}
+
+#news .node:last-child,
+#center .view-taxonomy-term .views-row-last .node,
+#center .news-archive .views-row-last .node
+{
+  border-bottom: none;
+}
+
+
+/* NEWS generic page */
+
+.news .node .content {
+    margin-top: 20px;
+}
+
+.news .node .content, .news .node .content * {
+    color: #2A2A2A;
+}
+
+.news .node .content a {
+    color: #E24B00;
+}
+
+.submitted {
+    font-size: 11px;
+    margin:0;
+    color: #777;
+}
+
+.field-type-taxonomy-term-reference {
+    float:right;
+}
+
+
+.field-type-taxonomy-term-reference a {
+    display: block;
+    border-radius: 10px;
+    padding: 1px 10px;
+    background: #777;
+    color: white !important;
+    text-shadow: 0 1px 1px #222;
+    border-bottom: 1px solid #555;
+    border-top: 1px solid white;
+    font-size: 12px !important;
+    min-width: 106px;
+    text-align: center;
+    font-weight: normal;
+    margin-left: 10px;
+    line-height: 18px;
+}
+.terms-inline a {
+    font-size: 12px !important;
+    color: white !important;
+}
+
+li.node_read_more, li.upload_attachments {
+    font-style: italic;
+    padding: 0 !important;
+    margin-right: 5px;
+}
+
+.field .field-label {
+    display: none;
+}
+
+#news ul.links,
+#center .news-archive ul.links,
+#center .view-taxonomy-term ul.links {
+    float:right;
+}
+
+#news .links a, 
+#news .comment .links a,
+#center .view-taxonomy-term .links a,
+#center .view-taxonomy-term .comment .links a,
+#center .news-archive .links a,
+#center .news-archive .comment .links a
+{
+    color: #555;
+    font-size: 11px;
+}
+
+/* End News */
+
+/* Sidebar */
+
+#center .sidebar {
+}
+
+#center.sidebar-left {
+}
+
+#sidebar-right {
+    border-left: 1px #F0F0F0 solid;
+    float: right;
+    padding: 10px;
+}
+
+#content, #subheader {
+    background: none repeat scroll 0 0 transparent;
+}
+
+#sidebar-left {
+    margin-top: 15px;
+}
+
+.sidebar .block-comment ul {
+    font-size: 10px;
+}
+
+.sidebar .block-taxonomy-block li {
+    margin-bottom: 8px;
+}
+
+.sidebar .block-taxonomy-block ul {
+  list-style: none;
+}
+
+/* Social buttons */
+.tweetbutton {
+    float: right;
+    margin-top: 1.5em;
+}
+
+#disqus_thread {
+    margin-top: 70px;
+}

@@ -1,0 +1,230 @@
+/* 
+ * This file contains css style used in "caratteristiche" pages. 
+ */
+ 
+/* START General style */
+.features .page-description {
+    background: none repeat scroll 0 0 transparent;
+    border-color: #F4F4F4;
+    margin-bottom: 80px;
+    text-align: justify;
+    width: 482px;
+}
+
+.features .page-description-img {
+    float: right;
+    width: 160px;
+    margin-top:-46px;
+}
+
+.features .page-description-img p {
+    margin:0;
+    padding:0;
+    text-align:center;
+}
+
+.features, .slide {
+   width: 100%;
+}
+
+.features .slide {
+   border: 1px solid #F0F0F0;
+   border-radius: 5px;
+   -moz-border-radius: 5px;
+   -webkit-border-radius: 5px;
+   height: 355px;
+   margin-bottom: 30px;
+   overflow: hidden;
+   position: relative;
+}
+
+.features h1.title,
+.features .header {
+   background: none repeat scroll 0 0 #f7f7f7;
+   border-bottom: 1px solid #f0f0f0;
+}
+
+.features h1.slidetitle,
+.features h1.title,
+.features .header h1 {
+   font-size: 22px;
+   margin: 0;
+   padding: 8px;
+}
+
+.features .text {
+   bottom: 35px;
+   min-height: 329px;
+   overflow: auto;
+   position: absolute;
+   top: 60px;
+   width: 248px;
+   left:10px;
+}
+
+.features .text > div > .subtitle {
+   border-bottom: 1px dotted #333333;
+   font-size: inherit;
+   font-weight: normal;
+   margin-bottom: 5px !important;
+   margin-top: 0 !important;
+   padding-bottom: 2px;
+   text-decoration: none;
+}
+
+.features .featured li .caption {
+   display: table-cell;
+   vertical-align: middle;
+}
+
+.features .featured li {
+   display: table-row;
+}
+
+.features .featured li {
+   padding-bottom: 8px;
+}
+
+.features .featured ul {
+   display: table;
+   padding:0;
+   margin:0;
+}
+
+.features ol, .features ul {
+   list-style: none outside none;
+}
+
+.features .featured li .icon {
+   display: table-cell;
+   height: auto;
+   padding-right: 12px;
+   width: 24px;
+}
+
+/* END General style */
+
+
+/* START Ubuntu features style */
+
+.features #features-ubuntu .main .screenshot {
+   box-shadow: 0 0 5px #999999;
+   -moz-box-shadow: 0 0 5px #999999;
+   -webkit-box-shadow: 0 0 5px #999999;
+   position: absolute;
+   right: -2px;
+   top: 52px;
+}
+
+.features #features-ubuntu #welcome {
+  height: 450px;
+  background: #3C3B37;
+}
+
+.features #features-ubuntu #welcome .text,
+.features #features-ubuntu #welcome .header {
+    background: none;
+    border: none;
+    position: absolute;
+    z-index: 1;
+}
+
+.features #features-ubuntu #welcome .header h1 {
+  color: #F7F6F6;
+  margin: 15px;
+  font-size: 36px;
+}
+
+.features #features-ubuntu #welcome .text p {
+  color: #F7F6F6;
+  font-size: 14px;
+  line-height: 18px;
+  margin: 20px;
+}
+
+.features #features-ubuntu #welcome .screenshot {
+  top: 80px;
+  width: 640px;
+}
+/* END Ubuntu features style */
+
+
+
+/* START Kubuntu features style */ 
+
+.features #features-kubuntu .icon {
+   position: absolute;
+   right: 0px;
+   bottom: 0px;
+}
+
+.features #features-kubuntu .main .content {
+  width: 450px;
+}
+
+.features #features-kubuntu .main .content p.special {
+    font-weight: bold;
+    margin-left: 40px;
+}
+
+/* END Kubuntu features style */ 
+
+
+/* START mythbuntu features style - copy of kubuntu's features style */ 
+
+.features #features-mythbuntu .icon {
+   position: absolute;
+   right: 10px; /* != kubuntu style */
+   top: 75px; /* != kubuntu style*/
+}
+
+.features #features-mythbuntu .main .content {
+  width: 450px;
+}
+
+.features #features-mythbuntu .main .content p.special {
+    font-weight: bold;
+    margin-left: 40px;
+}
+
+/* END mythbuntu features style - copy of kubuntu's feature style */
+
+
+/* START Xubuntu features style */ 
+.features #features-xubuntu .main .shot {
+   position: absolute;
+   right: 0px;
+   top: 52px;
+}
+
+.features #features-xubuntu .main .content {
+  width: 250px;
+  margin-left: 10px;
+  margin-top: 10px;
+  width: 250px;
+}
+
+.features #features-xubuntu .main .paths h2 {
+  font-size:16px;
+}
+
+/* END Xubuntu features style */
+
+
+/* START edubuntu features style */
+.features #features-edubuntu .icon {
+   position: absolute;
+   right: 20px;
+   bottom: 20px;
+}
+/* END edubuntu features style */
+
+
+/* START lubuntu features style */
+.features #features-lubuntu .screenshot {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}
+/* END lubuntu features style */
+
