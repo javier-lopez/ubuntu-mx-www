@@ -28,7 +28,7 @@
             <span class="new"><?php print drupal_ucfirst($new) ?></span>
           <?php endif; ?>
 
-          <?php if ($links): ?>
+          <?php if (isset($links)): ?>
             <div class="links"><?php print render($links); ?></div>
           <?php endif; ?>
         </div>

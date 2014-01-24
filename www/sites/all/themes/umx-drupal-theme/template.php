@@ -234,9 +234,9 @@ function umx_secondary_menu($secondary_menu) {
     return theme(
       'links__system_secondary_menu',
       array(
-        'links' => $secondary_menu,
+        'links'      => $secondary_menu,
         'attributes' => array(
-          'id' => 'secondary-menu',
+          'id'    => 'secondary-menu',
           'class' => array(
             'links',
             'inline',
