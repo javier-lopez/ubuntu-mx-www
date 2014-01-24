@@ -295,24 +295,24 @@ table#attachments {
     background-position: 24px 50%;
 }
 
-#header #ubuntu-it-sites {
+#header #ubuntu-mx-sites {
     float: right;
     font-size: 10.5px;
 }
 
-#header #ubuntu-it-sites a {
+#header #ubuntu-mx-sites a {
     color: #FFFFFF;
     text-shadow: none;
     padding: 1px 6px 2px;
 }
 
 
-#header #ubuntu-it-sites a:hover {
+#header #ubuntu-mx-sites a:hover {
     text-shadow: 1px 1px 1px #333333;
     text-decoration: none;
 }
 
-#header #ubuntu-it-sites a.active {
+#header #ubuntu-mx-sites a.active {
   background: url(../images/header-uit-bk.png) repeat;
   border: 1px solid #6F202A;
   background: rgba(0, 0, 0, 0.25);
@@ -434,6 +434,12 @@ table#attachments {
 
 #footer .block-menu .content > ul > li > ul > li > ul {
   display: none;
+}
+
+#footer .disclaimer {
+  text-align: center;
+  color: #333;
+  font-size: 10px;
 }
 
 #search-box div {

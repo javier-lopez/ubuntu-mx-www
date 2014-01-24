@@ -9,7 +9,7 @@
 /**
 *  * Override of theme_breadcrumb().
 *   */
-function udtheme_breadcrumb($variables) {
+function umx_breadcrumb($variables) {
 
   # Show breadcrumb only in admin pages
   if (module_exists('path')) {
@@ -32,15 +32,15 @@ function udtheme_breadcrumb($variables) {
  * hook_form_alter()
  * Override display of search block.
  */
-function udtheme_form_alter(&$form, &$form_state, $form_id) {
+function umx_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'search_block_form') {
     $form['search_block_form']['#title'] = '';
     $form['search_block_form']['#title_display'] = 'invisible';
-    $form['search_block_form']['#default_value'] = t('Search...');
-    $form['actions']['submit']['#value'] = t('Go');
+    $form['search_block_form']['#default_value'] = t('');
+    $form['actions']['submit']['#value'] = t('Buscar');
 
-    $form['search_block_form']['#attributes']['onblur'] = "if (this.value == '') {this.value = 'Search...';}";
-    $form['search_block_form']['#attributes']['onfocus'] = "if (this.value == 'Search...') {this.value = '';}";
+    $form['search_block_form']['#attributes']['onblur'] = "if (this.value == '') {this.value = '';}";
+    $form['search_block_form']['#attributes']['onfocus'] = "if (this.value == '') {this.value = '';}";
   }
 }
 
@@ -48,25 +48,26 @@ function udtheme_form_alter(&$form, &$form_state, $form_id) {
  * hook_preprocess_page
  * Generate / override exsisting variables
  */
-function udtheme_preprocess_page(&$vars) {
-  $vars['menu']         = udtheme_whichmenu($vars['main_menu']);
-  $vars['submenu']      = udtheme_secondary_menu($vars['secondary_menu']);
-  $vars['logo']         = udtheme_buildlogo($vars);
-  $vars['search']       = udtheme_render_search();
+function umx_preprocess_page(&$vars) {
+  $vars['menu']               = umx_whichmenu($vars['main_menu']);
+  $vars['submenu']            = umx_secondary_menu($vars['secondary_menu']);
+  $vars['logo']               = umx_buildlogo($vars);
+  $vars['search']             = umx_render_search();
+  $vars['ubuntu_footer_text'] = umx_footer_text();
 
   drupal_add_html_head(
     array(
-      '#type' => 'markup',
-      '#markup' => udtheme_pagesize(),
+      '#type'   => 'markup',
+      '#markup' => umx_pagesize(),
     ),
-    'udtheme-pagesize'
+    'umx-pagesize'
   );
 
-  if ($trademark = udtheme_trademark()) {
+  if ($trademark = umx_trademark()) {
     $vars['css']        = drupal_add_css($trademark);
     $vars['styles']     = drupal_get_css();
   }
-  elseif ($pallette = udtheme_pallette()) {
+  elseif ($pallette = umx_pallette()) {
     $vars['css']        = drupal_add_css($pallette);
     $vars['styles']     = drupal_get_css();
   }
@@ -84,7 +85,7 @@ function udtheme_preprocess_page(&$vars) {
  * Automatically use the nice_menu module if available
  * If not available, no drop downs will be displayed
  */
-function udtheme_whichmenu($primary_links) {
+function umx_whichmenu($primary_links) {
 
   if (module_exists('nice_menus')) {
     // Nice Menu
@@ -104,7 +105,7 @@ function udtheme_whichmenu($primary_links) {
 /**
  * Generate a logo if the variable exists
  */
-function udtheme_buildlogo($vars) {
+function umx_buildlogo($vars) {
   if ($vars['logo']) {
     $logo = '<div id="logo">' .
             '  <a href="' . check_url($vars['front_page']) . '" title="' . $vars['site_name'] . '">' .
@@ -122,7 +123,7 @@ function udtheme_buildlogo($vars) {
  * Render the search block as a themed area.
  * This was removed in D7.
  */
-function udtheme_render_search() {
+function umx_render_search() {
   if (theme_get_setting('render_search')) {
     $search  = '<div id="search" class="block block-theme">';
     $search .= render(drupal_get_form('search_block_form'));
@@ -136,23 +137,13 @@ function udtheme_render_search() {
 
 /**
  * Generate the default footer text.
- * This big ugly thing keeps us from needing to set the default in udtheme.info.
+ * This big ugly thing keeps us from needing to set the default in umx.info.
  */
-function udtheme_footer_text() {
-  // The default in udtheme.info is 'unset'
+function umx_footer_text() {
+  // The default in umx.info is 'unset'
   if (theme_get_setting('ubuntu_footer_text') == 'unset') {
-    return t('<div class="block"><h2>@legal</h2> !copy </div>'
-      . '<div class="block"><h2>@more</h2>!getubuntu !brainstorm !forums !spread </div>',
-      array(
-        '@legal' => t('Legal Disclaimer'),
-        '!copy' => t('&copy; 2010 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.'),
-        '@more' => t('More Ubuntu'),
-        '!getubuntu' => l(t('Get Ubuntu'), 'http://ubuntu.com/getubuntu/download/'),
-        '!brainstorm' => l(t('Ubuntu Brainstorm'), 'http://brainstorm.ubuntu.com/'),
-        '!forums' => l(t('Ubuntu Forums'), 'http://ubuntuforums.org/'),
-        '!spread' => l(t('Spread Ubuntu'), 'http://spreadubuntu.neomenlo.org/'),
-      )
-    );
+    $footer_text = '&copy; 2013 Canonical Ltd. Ubuntu y Canonical son marcas registradas de Canonical Ltd.';
+    return $footer_text;
   }
   else {
     return theme_get_setting('ubuntu_footer_text');
@@ -162,7 +153,7 @@ function udtheme_footer_text() {
 /**
  * Theme setting to either show or hide extra help
  */
-function udtheme_help($help = NULL) {
+function umx_help($help = NULL) {
   return theme_get_setting('display_help') ? $help : NULL;
 }
 
@@ -170,7 +161,7 @@ function udtheme_help($help = NULL) {
  * Build some CSS to set the width of the page.
  * Not optimal, but it works.
  */
-function udtheme_pagesize() {
+function umx_pagesize() {
   $width_max = theme_get_setting('page_maxwidth');
   $width_min = theme_get_setting('page_minwidth');
   if (!isset($width_min) || $width_min == '') {
@@ -193,16 +184,16 @@ function udtheme_pagesize() {
 /**
  * Return style sheet theme to be added to base style
  */
-function udtheme_pallette() {
-    return path_to_theme() . '/styles/' . theme_get_setting('udtheme_style') . '.css';
+function umx_pallette() {
+    return path_to_theme() . '/styles/' . theme_get_setting('umx_style') . '.css';
 }
 
 /**
  * Add CSS for trademarked sites. Trademarked CSS files are download into the
  * temporary CSS directory.
  */
-function udtheme_trademark() {
-  if (theme_get_setting('udtheme_trademark')) {
+function umx_trademark() {
+  if (theme_get_setting('umx_trademark')) {
     $csspath = file_create_path('css');
     foreach (array('trademark-rtl.css', 'trademark.css') as $filename) {
       $filepath = $csspath .'/'. $filename;
@@ -222,7 +213,7 @@ function udtheme_trademark() {
           file_save_data($response->data, $filepath, FILE_EXISTS_REPLACE);
         }
         else {
-          watchdog('udtheme', 'Unabled to download <a href="@url">@filename</a>: @code @status_message', array(
+          watchdog('umx', 'Unabled to download <a href="@url">@filename</a>: @code @status_message', array(
             '@url' => $url,
             '@filename' => $filename,
             '@code' => $response->code,
@@ -238,7 +229,7 @@ function udtheme_trademark() {
 /**
  * Renders the secondary links in a nice pretty way.
  */
-function udtheme_secondary_menu($secondary_menu) {
+function umx_secondary_menu($secondary_menu) {
   if (isset($secondary_menu)) {
     return theme(
       'links__system_secondary_menu',
@@ -265,7 +256,7 @@ function udtheme_secondary_menu($secondary_menu) {
  * Sets the body-tag class attribute.
  * Adds 'sidebar-left', 'sidebar-right' or 'sidebars' classes as needed.
  */
-function udtheme_body_class($left = '', $right = '') {
+function umx_body_class($left = '', $right = '') {
   if ($left != '' && $right != '') {
     $class = 'sidebars';
   }
@@ -284,28 +275,28 @@ function udtheme_body_class($left = '', $right = '') {
 /**
  * Add Google+ verify at homepage and WebmasterTool
  */
-function udtheme_page_alter($page) {
+function umx_page_alter($page) {
    $element = array(
-    '#type' => 'html_tag',
-    '#tag' => 'link',
+    '#type'       => 'html_tag',
+    '#tag'        => 'link',
     '#attributes' => array(
-      'href' => 'https://plus.google.com/+ubuntuit',
-      'rel' => 'publisher',
+      'href'      => 'https://plus.google.com/u/0/b/117346867381648203440/117346867381648203440/posts',
+      'rel'       => 'publisher',
     ),
   );
 
   $webmaster = array(
-    '#type' => 'html_tag',
-    '#tag' => 'meta',
+    '#type'       => 'html_tag',
+    '#tag'        => 'meta',
     '#attributes' => array(
-      'name' => 'google-site-verification',
-      'content' => 'soeC23ZVtNyi1idChzdSdG-dEmyMqdfpjGY1rf_XqnQ',
+      'name'      => 'google-site-verification',
+      'content'   => 'soeC23ZVtNyi1idChzdSdG-dEmyMqdfpjGY1rf_XqnQ',
     ),
   );
 
   // If it's homepage, we add the verify link 
   if (drupal_is_front_page()) {
     drupal_add_html_head($element, 'google_plus');
-    drupal_add_html_head($webmaster, 'webmaster');
+    //drupal_add_html_head($webmaster, 'webmaster');
   }
 }

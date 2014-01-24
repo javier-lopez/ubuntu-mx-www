@@ -13,24 +13,25 @@
         <div id="header" class="shadowed curved-bottom">
           <div class="container">
             <?php print $menu; ?>
+            <?php print $logo; ?>
             
-            <div id="logo">  
-              <div id="ubuntu-it-sites">
-                  <a class="active" id="" href="http://www.ubuntu-it.org">web</a>
-                  <a href="http://wiki.ubuntu-it.org">wiki</a>
-                  <a id="" href="http://forum.ubuntu-it.org">forum</a>
-                  <a id="" href="http://chiedi.ubuntu-it.org">chiedi</a>
-                  <a id="" href="http://chat.ubuntu-it.org">chat</a>
-                  <a id="" href="http://cerca.ubuntu-it.org">cerca</a>
-                  <a id="" href="http://planet.ubuntu-it.org">planet</a>
-              </div>
-              <span class="suffix">web</span><span class="title">ubuntu-it</span>
-              <span class="description">comunità italiana</span>
-            </div>  
-            
+            <!--<div id="logo">  -->
+              <!--
+                 -<div id="ubuntu-mx-sites">
+                 -    <a class="active" id="" href="http://ubuntumexico.org/">web</a>
+                 -    <a href="http://wiki.ubuntu.com/UbuntuMxTeam/">wiki</a>
+                 -    <a id="" href="http://ubuntumexico.org/forum">foro</a>
+                 -    <a id="" href="http://ubuntu.shapado.com/">preguntas</a>
+                 -    <a id="" href="#">irc</a>
+                 -    <a id="" href="#">planeta</a>
+                 -</div>
+                 -->
+              <!--<span class="suffix">web</span><span class="title">ubuntu-mx</span>-->
+              <!--<span class="description">comunidad mexicana</span>-->
+            <!--</div>  -->
             
             <div class="buttons">
-              <div id="accessibility" title="Maggiore focus ai contenuti" onclick='accessibility_toggle();'></div>
+              <div id="accessibility" title="cambiar colores de fondo" onclick='accessibility_toggle();'></div>
             </div>
             <?php if ($search) { ?>
               <div class="block block-theme">
@@ -92,8 +93,13 @@
     <!-- Footer -->
       <div id="footer">
         <div class="container">
-          <?php print render($page['footer']);?>
-          <?php print render($page['closure']); ?>
+            <?php if ($ubuntu_footer_text) { ?>
+              <div class="disclaimer">
+                <?php print $ubuntu_footer_text ?>
+              </div>
+            <?php } ?>
+          <!--<?php print render($page['footer']);?>-->
+          <!--<?php print render($page['closure']); ?>-->
         </div>
       </div>
     <?php # Check if page is panel then run "panels()" script

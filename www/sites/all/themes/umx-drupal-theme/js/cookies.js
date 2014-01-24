@@ -1,6 +1,6 @@
 // Common variabiles
-COOKIE_DOMAIN = "ubuntu-it.org";
-COOKIE_PREFIX = "ubuntu-it_custom_";
+COOKIE_DOMAIN = "msg.sh";
+COOKIE_PREFIX = "ubuntumexico_custom_";
 COOKIE_ACCESIBILITY_NAME = "accessibility";
 
 

@@ -1,16 +1,15 @@
 ; $Id$
 name        = Ubuntu-mx Drupal Theme
-description = Ubuntu-mx is a theme for the Ubuntu-mx LoCo web site. This mostly a translated version of the Ubuntu-it drupal theme which was introduced after the new branding for Ubuntu in 2010.
+description = This is the theme used at the Ubuntu-mx LoCo web site. It's mostly a Spanish translation of the Ubuntu-it drupal theme which was introduced after the new branding for Ubuntu in 2010.
 core        = 7.x
 version     = 7.7.0
 engine      = phptemplate
 
 settings[page_maxwidth]      = 985px
 settings[page_minwidth]      = ''
-settings[ubuntu_footer]      = unset
-settings[udtheme_style]      = classic-brown
-settings[udtheme_trademark]  = 0
-settings[render_search]      = 0
+settings[umx_style]          = classic-brown
+settings[umx_trademark]      = 0
+settings[render_search]      = 1
 settings[display_help]       = 0
 settings[ubuntu_footer]      = 1
 settings[ubuntu_footer_text] = unset

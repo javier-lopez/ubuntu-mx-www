@@ -5,8 +5,8 @@
 
 //ACCESSIBILITY_CSS_THEME_DIR = 'light-drupal-theme/styles';
 //ACCESSIBILITY_CSS_FILE_NAME = 'accessibility.css' ;
-ACCESSIBILITY_CSS_ABSPATH = ['http://ubuntu-it.org/sites/all/themes/light-drupal-theme/styles/accessibility.css'];
-ACCESSIBILITY_COOKIE_VALUE_ON = 'on';
+ACCESSIBILITY_CSS_ABSPATH      = ['/sites/all/themes/umx-drupal-theme/styles/accessibility.css'];
+ACCESSIBILITY_COOKIE_VALUE_ON  = 'on';
 ACCESSIBILITY_COOKIE_VALUE_OFF = 'off';
 
 // This function adds the accessibility css into the Head section

@@ -66,22 +66,28 @@ body {
 
 #header .block {
   float: right;
-  margin: 20px 5px 0;
+  margin: 12px 12px 0;
 }
 
 #header #search {
+  background: none repeat scroll 0 0 #FFFFFF;
+  border: 0 solid #B73F00;
   border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  width: 150px;
+  box-shadow: 2px 2px 2px #BBBBBB inset;
 }
 
 #header #search * {
-  margin: 0;
-  padding: 0;
+  background: none repeat scroll 0 0 rgba(0,0,0,0);
+  border: medium none;
+  color: #E24E00;
   font-size: 10px !important;
   font-weight: bold;
-  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+#header #search label {
+  display: none;
 }
 
 #header #search .form-text {
@@ -90,13 +96,17 @@ body {
 
 #header #search .form-submit {
   cursor: pointer;
-  float: right;
-  padding: 5px 3px 0 1px;
+  padding: 2px 3px 0 1px;
 }
 
 #logo {
   float: right;
   margin: 11px 5px 0;
+}
+
+#logo img {
+  display: block;
+  margin-top: 10px;
 }
 
 /**
@@ -251,14 +261,20 @@ h1 {
 }
 
 .node .links a, .comment .links a {
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .forum-topic-navigation {
   height: 1.5em;
 }
 
-input, select {
+input, select, textarea {
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+  border: 1px solid #CCCCCC;
+  border-radius: 5px 5px 5px 5px;
+  font-size: 12px !important;
+  margin: 0;
+  padding: 3px 3px;
   vertical-align: middle;
 }
 
