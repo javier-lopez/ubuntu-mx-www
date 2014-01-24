@@ -11,7 +11,7 @@ errorfile="/tmp/deploy.$$.error"
 #default apps
 apps_install="git-core apache2 php5 libapache2-mod-php5 php5-mcrypt php5-pgsql
 php5-suhosin php5-gd libgd2-xpm libjpeg-turbo8 libjpeg8 mysql-server mysql-client
-php5-mysql php5-curl php5-json php5-dev php-pear"
+php5-mysql php5-curl php5-json php5-dev php-pear iptables mailutils exim4"
 
 ##################
 #general functions
@@ -465,9 +465,9 @@ _deploy()
     deploy_var_mysql_root_passwd=$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 8 | tr -d '\n')
     deploy_var_mysql_drupal_passwd=$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 8 | tr -d '\n')
 
-    echo "mysql-server mysql-server/root_password password $deploy_var_mysql_root_passwd" \
+    printf "%s" "mysql-server mysql-server/root_password password $deploy_var_mysql_root_passwd" \
         > mysql-server.passwd 
-    echo "mysql-server mysql-server/root_password_again password $deploy_var_mysql_root_passwd" \
+    printf "%s" "mysql-server mysql-server/root_password_again password $deploy_var_mysql_root_passwd" \
         >> mysql-server.passwd
     _cmdsudo debconf-set-selections mysql-server.passwd
     _cmd rm -rf mysql-server.passwd
@@ -517,7 +517,7 @@ _deploy()
     _printfl "Configuring apps"
     _printfs "configuring mysql ..."
     _cmd mysql -uroot -p$deploy_var_mysql_root_passwd -e \'create database if not exists drupal\' #'
-    _deploy_var_grant=$(echo 'grant all on drupal.* to drupal@localhost identified by "passwd"' \
+    _deploy_var_grant=$(printf "%s" 'grant all on drupal.* to drupal@localhost identified by "passwd"' \
                        | sed s:passwd:$deploy_var_mysql_drupal_passwd:g)
     _cmd mysql -uroot -p$deploy_var_mysql_root_passwd -e \'$_deploy_var_grant\' #'
     
@@ -526,8 +526,10 @@ _deploy()
     _cmdsudo a2enmod headers
     _cmdsudo sed -i -e \\\"/AllowOverride/ \
         s:.*:AllowOverride All:\\\" /etc/apache2/sites-available/default
-    echo "extension=uploadprogress.so" > uploadprogress.ini
+    printf "%s" "extension=uploadprogress.so" > uploadprogress.ini
     _cmdsudo mv uploadprogress.ini /etc/php5/conf.d/
+    _cmdsudo sed -i -e \\\"/^memory_limit/ \
+        s:.*:memory_limit = 248AllowOverrideM:\\\" /etc/php5/apache2/php.ini
     _cmdsudo service apache2 restart
     _cmdsudo chown -R www-data.www-data /var/www/
 
@@ -541,6 +543,60 @@ _deploy()
         #deploy_var_crontab="*/5 \* \* \* \* root /usr/local/bin/deploy"
         #_cmdsudo sed -i -e \\\"\$ a$deploy_var_crontab\\\" /etc/crontab
     fi
+
+    _printfs "configuring exim4 ..."
+    _cmdsudo sed -i -e \\\"/^dc_eximconfig_configtype/ \
+        s:.*:dc_eximconfig_configtype='internet':\\\" /etc/exim4/update-exim4.conf.conf
+    _cmdsudo service exim4 restart
+
+    _printfs "configuring iptables ..."
+    printf "%s" "*filter" >  iptables.up.rules
+    printf "%s" "# http://articles.slicehost.com/2010/4/30/ubuntu-lucid-setup-part-1" >> iptables.up.rules
+    printf "%s" "# Allows all loopback (lo0) traffic and drop all traffic to 127/8 that doesn't use lo0" >> iptables.up.rules
+    printf "%s" "-A INPUT -i lo -j ACCEPT" >> iptables.up.rules
+    printf "%s" "-A INPUT ! -i lo -d 127.0.0.0/8 -j REJECT" >> iptables.up.rules
+    printf "%s" "# Accepts all established inbound connections" >> iptables.up.rules
+    printf "%s" "-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT" >> iptables.up.rules
+    printf "%s" "# Allows all outbound traffic" >> iptables.up.rules
+    printf "%s" "# You can modify this to only allow certain traffic" >> iptables.up.rules
+    printf "%s" "-A OUTPUT -j ACCEPT" >> iptables.up.rules
+    printf "%s" "# Allows HTTP and HTTPS connections from anywhere (the normal ports for websites)" >> iptables.up.rules
+    printf "%s" "-A INPUT -p tcp --dport 80 -j ACCEPT" >> iptables.up.rules
+    printf "%s" "-A INPUT -p tcp --dport 443 -j ACCEPT" >> iptables.up.rules
+    printf "%s" "# UN-COMMENT THESE IF YOU USE INCOMING MAIL!" >> iptables.up.rules
+    printf "%s" "# Allows POP (and SSL-POP)" >> iptables.up.rules
+    printf "%s" "#-A INPUT -p tcp --dport 110 -j ACCEPT" >> iptables.up.rules
+    printf "%s" "#-A INPUT -p tcp --dport 995 -j ACCEPT" >> iptables.up.rules
+    printf "%s" "# SMTP (and SSMTP)" >> iptables.up.rules
+    printf "%s" "#-A INPUT -p tcp --dport 25 -j ACCEPT" >> iptables.up.rules
+    printf "%s" "#-A INPUT -p tcp --dport 465 -j ACCEPT" >> iptables.up.rules
+    printf "%s" "# IMAP (and IMAPS)" >> iptables.up.rules
+    printf "%s" "#-A INPUT -p tcp --dport 143 -j ACCEPT" >> iptables.up.rules
+    printf "%s" "#-A INPUT -p tcp --dport 993 -j ACCEPT" >> iptables.up.rules
+    printf "%s" "# Allows SSH connections (only 3 attempts by an IP every minute, drop the rest to prevent SSH attacks)" >> iptables.up.rules
+    printf "%s" "-A INPUT -p tcp -m tcp --dport $1 -m state --state NEW -m recent --set --name DEFAULT --rsource" >> iptables.up.rules
+    printf "%s" "-A INPUT -p tcp -m tcp --dport $1 -m state --state NEW -m recent --update --seconds 60 --hitcount 3 --name DEFAULT --rsource -j DROP" >> iptables.up.rules
+    printf "%s" "-A INPUT -p tcp -m state --state NEW --dport $1 -j ACCEPT" >> iptables.up.rules
+    printf "%s" "# Allow ping" >> iptables.up.rules
+    printf "%s" "-A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT" >> iptables.up.rules
+    printf "%s" "# log iptables denied calls (Can grow log files fast!)" >> iptables.up.rules
+    printf "%s" "#-A INPUT -m limit --limit 5/min -j LOG --log-prefix "iptables denied: " --log-level 7" >> iptables.up.rules
+    printf "%s" "# Misc" >> iptables.up.rules
+    printf "%s" "# Reject all other inbound - default deny unless explicitly allowed policy" >> iptables.up.rules
+    printf "%s" "#-A INPUT -j REJECT" >> iptables.up.rules
+    printf "%s" "#-A FORWARD -j REJECT" >> iptables.up.rules
+    printf "%s" "# It's safer to just DROP the packet" >> iptables.up.rules
+    printf "%s" "-A INPUT -j DROP" >> iptables.up.rules
+    printf "%s" "-A FORWARD -j DROP" >> iptables.up.rules
+    printf "%s" "COMMIT" >> iptables.up.rules
+
+    printf "%s\\n" "#!/bin/sh" > iptables
+    printf "%s\\n" "/sbin/iptables-restore < /etc/iptables.up.rules" > iptables
+
+    _cmdsudo mv iptables.up.rules /etc/
+    _cmd chmod +x iptables
+    _cmdsudo mv iptables /etc/network/if-pre-up.d/
+    _cmdsudo /etc/network/if-pre-up.d/iptables
 
     ############################################################################
 
