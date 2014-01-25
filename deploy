@@ -475,7 +475,8 @@ _deploy()
     _printfs "installing deps ..."
     _waitforsudo apt-get update
     _waitforsudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y $apps_install
-    _waitforsudo pecl install uploadprogress
+    _deploy_var_uploadprogress=$(pecl list | grep uploadprogress)
+    [ -z "$_deploy_var_uploadprogress" ] && _cmdsudo pecl install uploadprogress
 
     if ! command -v "git" >/dev/null; then
         _die "Dependency step failed"
@@ -535,10 +536,10 @@ _deploy()
 
     _printfs "configuring cron ..."
 
-    _cmd wget --no-check-certificate "$updates"
-    if [ -f $(basename "$updates") ]; then
-        _cmd chmod +x $(basename "$updates")
-        _cmdsudo mv $(basename "$updates") /usr/local/bin/
+    _cmd wget --no-check-certificate "$updates" -O $$.deploy
+    if [ -f "$$.deploy" ]; then
+        _cmd chmod +x $$.deploy
+        _cmdsudo mv $$.deploy /usr/local/bin/deploy
         _cmdsudo sed \\\"/deploy/d\\\" /etc/crontab
         #deploy_var_crontab="*/5 \* \* \* \* root /usr/local/bin/deploy"
         #_cmdsudo sed -i -e \\\"\$ a$deploy_var_crontab\\\" /etc/crontab
