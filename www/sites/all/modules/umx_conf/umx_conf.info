@@ -13,7 +13,6 @@ dependencies[] = l10n_update
 dependencies[] = locale
 dependencies[] = menu
 dependencies[] = search
-dependencies[] = smtp
 
 features[ckeditor_profile][] = Advanced
 features[ckeditor_profile][] = CKEditor Global Profile
