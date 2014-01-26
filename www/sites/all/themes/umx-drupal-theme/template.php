@@ -9,7 +9,7 @@
 /**
 *  * Override of theme_breadcrumb().
 *   */
-function umx_breadcrumb($variables) {
+function umxtheme_breadcrumb($variables) {
 
   # Show breadcrumb only in admin pages
   if (module_exists('path')) {
@@ -32,7 +32,7 @@ function umx_breadcrumb($variables) {
  * hook_form_alter()
  * Override display of search block.
  */
-function umx_form_alter(&$form, &$form_state, $form_id) {
+function umxtheme_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'search_block_form') {
     $form['search_block_form']['#title'] = '';
     $form['search_block_form']['#title_display'] = 'invisible';
@@ -48,26 +48,26 @@ function umx_form_alter(&$form, &$form_state, $form_id) {
  * hook_preprocess_page
  * Generate / override exsisting variables
  */
-function umx_preprocess_page(&$vars) {
-  $vars['menu']               = umx_whichmenu($vars['main_menu']);
-  $vars['submenu']            = umx_secondary_menu($vars['secondary_menu']);
-  $vars['logo']               = umx_buildlogo($vars);
-  $vars['search']             = umx_render_search();
-  $vars['ubuntu_footer_text'] = umx_footer_text();
+function umxtheme_preprocess_page(&$vars) {
+  $vars['menu']               = umxtheme_whichmenu($vars['main_menu']);
+  $vars['submenu']            = umxtheme_secondary_menu($vars['secondary_menu']);
+  $vars['logo']               = umxtheme_buildlogo($vars);
+  $vars['search']             = umxtheme_render_search();
+  $vars['ubuntu_footer_text'] = umxtheme_footer_text();
 
   drupal_add_html_head(
     array(
       '#type'   => 'markup',
-      '#markup' => umx_pagesize(),
+      '#markup' => umxtheme_pagesize(),
     ),
-    'umx-pagesize'
+    'umxtheme-pagesize'
   );
 
-  if ($trademark = umx_trademark()) {
+  if ($trademark = umxtheme_trademark()) {
     $vars['css']        = drupal_add_css($trademark);
     $vars['styles']     = drupal_get_css();
   }
-  elseif ($pallette = umx_pallette()) {
+  elseif ($pallette = umxtheme_pallette()) {
     $vars['css']        = drupal_add_css($pallette);
     $vars['styles']     = drupal_get_css();
   }
@@ -85,7 +85,7 @@ function umx_preprocess_page(&$vars) {
  * Automatically use the nice_menu module if available
  * If not available, no drop downs will be displayed
  */
-function umx_whichmenu($primary_links) {
+function umxtheme_whichmenu($primary_links) {
 
   if (module_exists('nice_menus')) {
     // Nice Menu
@@ -105,7 +105,7 @@ function umx_whichmenu($primary_links) {
 /**
  * Generate a logo if the variable exists
  */
-function umx_buildlogo($vars) {
+function umxtheme_buildlogo($vars) {
   if ($vars['logo']) {
     $logo = '<div id="logo">' .
             '  <a href="' . check_url($vars['front_page']) . '" title="' . $vars['site_name'] . '">' .
@@ -123,7 +123,7 @@ function umx_buildlogo($vars) {
  * Render the search block as a themed area.
  * This was removed in D7.
  */
-function umx_render_search() {
+function umxtheme_render_search() {
   if (theme_get_setting('render_search')) {
     $search  = '<div id="search" class="block block-theme">';
     $search .= render(drupal_get_form('search_block_form'));
@@ -137,10 +137,10 @@ function umx_render_search() {
 
 /**
  * Generate the default footer text.
- * This big ugly thing keeps us from needing to set the default in umx.info.
+ * This big ugly thing keeps us from needing to set the default in umxtheme.info.
  */
-function umx_footer_text() {
-  // The default in umx.info is 'unset'
+function umxtheme_footer_text() {
+  // The default in umxtheme.info is 'unset'
   if (theme_get_setting('ubuntu_footer_text') == 'unset') {
     $footer_text = '&copy; 2013 Canonical Ltd. Ubuntu y Canonical son marcas registradas de Canonical Ltd.';
     return $footer_text;
@@ -153,7 +153,7 @@ function umx_footer_text() {
 /**
  * Theme setting to either show or hide extra help
  */
-function umx_help($help = NULL) {
+function umxtheme_help($help = NULL) {
   return theme_get_setting('display_help') ? $help : NULL;
 }
 
@@ -161,7 +161,7 @@ function umx_help($help = NULL) {
  * Build some CSS to set the width of the page.
  * Not optimal, but it works.
  */
-function umx_pagesize() {
+function umxtheme_pagesize() {
   $width_max = theme_get_setting('page_maxwidth');
   $width_min = theme_get_setting('page_minwidth');
   if (!isset($width_min) || $width_min == '') {
@@ -184,16 +184,16 @@ function umx_pagesize() {
 /**
  * Return style sheet theme to be added to base style
  */
-function umx_pallette() {
-    return path_to_theme() . '/styles/' . theme_get_setting('umx_style') . '.css';
+function umxtheme_pallette() {
+    return path_to_theme() . '/styles/' . theme_get_setting('umxtheme_style') . '.css';
 }
 
 /**
  * Add CSS for trademarked sites. Trademarked CSS files are download into the
  * temporary CSS directory.
  */
-function umx_trademark() {
-  if (theme_get_setting('umx_trademark')) {
+function umxtheme_trademark() {
+  if (theme_get_setting('umxtheme_trademark')) {
     $csspath = file_create_path('css');
     foreach (array('trademark-rtl.css', 'trademark.css') as $filename) {
       $filepath = $csspath .'/'. $filename;
@@ -213,7 +213,7 @@ function umx_trademark() {
           file_save_data($response->data, $filepath, FILE_EXISTS_REPLACE);
         }
         else {
-          watchdog('umx', 'Unabled to download <a href="@url">@filename</a>: @code @status_message', array(
+          watchdog('umxtheme', 'Unabled to download <a href="@url">@filename</a>: @code @status_message', array(
             '@url' => $url,
             '@filename' => $filename,
             '@code' => $response->code,
@@ -229,7 +229,7 @@ function umx_trademark() {
 /**
  * Renders the secondary links in a nice pretty way.
  */
-function umx_secondary_menu($secondary_menu) {
+function umxtheme_secondary_menu($secondary_menu) {
   if (isset($secondary_menu)) {
     return theme(
       'links__system_secondary_menu',
@@ -256,7 +256,7 @@ function umx_secondary_menu($secondary_menu) {
  * Sets the body-tag class attribute.
  * Adds 'sidebar-left', 'sidebar-right' or 'sidebars' classes as needed.
  */
-function umx_body_class($left = '', $right = '') {
+function umxtheme_body_class($left = '', $right = '') {
   if ($left != '' && $right != '') {
     $class = 'sidebars';
   }
@@ -275,7 +275,7 @@ function umx_body_class($left = '', $right = '') {
 /**
  * Add Google+ verify at homepage and WebmasterTool
  */
-function umx_page_alter($page) {
+function umxtheme_page_alter($page) {
    $element = array(
     '#type'       => 'html_tag',
     '#tag'        => 'link',

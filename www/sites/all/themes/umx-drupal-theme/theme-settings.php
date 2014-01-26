@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Theme setting callbacks for the umx theme.
+ * Theme setting callbacks for the umxtheme
  */
 
 /**
@@ -14,9 +14,9 @@
  * @param $form_state
  *   The form state.
  */
-function umx_form_system_theme_settings_alter(&$form, &$form_state) {
+function umxtheme_form_system_theme_settings_alter(&$form, &$form_state) {
   require_once 'template.php';
-  $ubuntu_footer_text = umx_footer_text();
+  $ubuntu_footer_text = umxtheme_footer_text();
 
   $form['page'] = array(
     '#type'        => 'fieldset',
@@ -77,7 +77,7 @@ function umx_form_system_theme_settings_alter(&$form, &$form_state) {
     '#collapsed'   => FALSE,
     '#tree'        => FALSE,
   );
-  $form['style']['umx_style'] = array(
+  $form['style']['umxtheme_style'] = array(
     '#type'           => 'radios',
     '#title'          => t('Ubuntu Style'),
     '#options'        => array(
@@ -87,9 +87,9 @@ function umx_form_system_theme_settings_alter(&$form, &$form_state) {
       'majan-blue'    => t('Majan\'s Blue'),
     ),
     '#description'   => t('Select which color pallet to apply to the theme. Under the trademark policy (http://bit.ly/Hk4DA) only Ubuntu related projects may use the "Official Ubuntu" style. The rest is open to anyone. NOTE: Only the Classic Brown theme works, do NOT change it'),
-    '#default_value' => theme_get_setting('umx_style'),
+    '#default_value' => theme_get_setting('umxtheme_style'),
   );
-  $form['style']['umx_trademark'] = array(
+  $form['style']['umxtheme_trademark'] = array(
     '#type'    => 'radios',
     '#title'   => t('Ubuntu Community Styles'),
     '#options' => array(
@@ -97,7 +97,7 @@ function umx_form_system_theme_settings_alter(&$form, &$form_state) {
       '1'      => t('Enabled'),
     ),
     '#description'   => t('This will override the above style sheet. It is for use by Ubuntu related projects only. It uses external images which are trademarked. (http://bit.ly/Hk4DA), NOTE: Currently broken, do NOT enable it'),
-    '#default_value' => theme_get_setting('umx_trademark'),
+    '#default_value' => theme_get_setting('umxtheme_trademark'),
   );
 
   // Return the additional form widgets

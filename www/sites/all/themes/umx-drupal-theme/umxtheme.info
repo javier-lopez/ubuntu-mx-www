@@ -7,8 +7,8 @@ engine      = phptemplate
 
 settings[page_maxwidth]      = 985px
 settings[page_minwidth]      = ''
-settings[umx_style]          = classic-brown
-settings[umx_trademark]      = 0
+settings[umxtheme_style]     = classic-brown
+settings[umxtheme_trademark] = 0
 settings[render_search]      = 1
 settings[display_help]       = 0
 settings[ubuntu_footer]      = 1
