@@ -57,7 +57,7 @@ _animcui()
 {   #wait animation
     [ -z "$1" ] && { printf "%5s\n" ""; return 1; }
 
-    if ! printf "%s" "$(pidof "$1")" | grep -v "[^0-9]" >/dev/null; then
+    if ! printf "%s" "$(pidof "$1")" | grep "[^0-9].*" >/dev/null; then
         printf "%5s\n" ""
         return 1;
     fi
