@@ -1,0 +1,33 @@
+name        = umx conf
+description = Common settings for the Ubuntu-mx local portal. NOTE: do not use it alone!, it should be called as dependency in a profile installation
+core        = 7.x
+package     = Features
+version     = 7.x-0.1
+project     = umx_conf
+
+dependencies[] = admin_menu
+dependencies[] = admin_menu_toolbar
+dependencies[] = ckeditor
+dependencies[] = features
+dependencies[] = l10n_update
+dependencies[] = locale
+dependencies[] = menu
+dependencies[] = search
+dependencies[] = smtp
+
+features[ckeditor_profile][] = Advanced
+features[ckeditor_profile][] = CKEditor Global Profile
+features[ckeditor_profile][] = Full
+
+features[features_api][]     = api:2
+
+features[user_permission][]  = search content
+features[user_permission][]  = use advanced search
+
+features[menu_custom][] = main-menu
+features[menu_links][]  = main-menu_portada:<front>
+features[menu_links][]  = main-menu_foros:http://google.com
+features[menu_links][]  = main-menu_preguntas:http://ubuntu.shapado.com
+features[menu_links][]  = main-menu_wiki:https://wiki.ubuntu.com/UbuntuMxTeam
+features[menu_links][]  = main-menu_chat:http://google.com
+features[menu_links][]  = main-menu_descargar-ubuntu:http://google.com

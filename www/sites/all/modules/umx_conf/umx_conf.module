@@ -1,0 +1,13 @@
+<?php
+/**
+ * @file
+ * Drupal needs this blank file.
+ */
+
+function umx_conf_help($path, $arg) {
+    switch ($path) {
+    case "admin/help#umx_conf_help":
+        return '<p>' . t("Common settings for the Ubuntu-mx local portal") . '</p>';
+        break;
+    }
+} 

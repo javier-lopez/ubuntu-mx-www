@@ -1,0 +1,81 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the umx installation profile.
+ */
+
+//function umx_install_finished() {
+//function umx_themes_enabled() {
+function umx_install() {
+    // some other code
+     //_system_rebuild_theme_data();
+    db_update('system')
+        ->fields(array('status' => 1))
+        ->condition('type', 'theme')
+        //->condition('name', 'seven')
+        ->condition('name', 'umxtheme')
+        ->execute();
+    //variable_set('theme_default', 'seven');
+    variable_set('theme_default', 'umxtheme');
+}
+
+//function umx_themes_enabled() {
+    //// Provides a list of currently available themes.
+    //$list_themes = list_themes(TRUE);
+    //// 6, 7, 8, etc.
+    //$major_version = (int)VERSION;
+
+    //$theme_default = isset($list_themes['seven']) ? 'seven' : 'garland';
+    //$admin_theme   = isset($list_themes['seven']) ? 'seven' : 'garland';
+
+    //// Changes the theme
+    //variable_set('theme_default', $theme_default);
+    //theme_enable($theme_default);
+    //theme_disable(array('bartik'));
+
+    //// Changes the administration
+    //if($affect_admin_theme){
+        //variable_set('admin_theme', $admin_theme);
+    //}
+
+    //// if Switchtheme module (https://drupal.org/project/switchtheme) is enabled, use it
+    //if (module_exists('switchtheme')) {
+        //if (empty($_GET['theme']) || $_GET['theme'] !== $theme_default) {
+            //$query = array(
+                //'theme' => $theme_default
+            //);
+            //// in D6, drupal_goto's second argument is the query string,
+            //// in >=D7, a more general $options array is used
+            //if($major_version < 7){
+                //$options = $query;
+            //}
+            //else{
+                //$options = array('query' => $query);
+            //}
+
+            //drupal_goto($_GET['q'], $options);
+        //}
+    //}
+//}
+
+//function umx_update_N() {
+    //variable_set('theme_default','seven');
+//}
+
+//function umx_themes_enabled() { 
+//function umx_install () {
+    //$enable = array(
+        ////'theme_default' => 'umx-drupal-theme',
+        //'theme_default' => 'umxtheme',
+        //'admin_theme'   => 'seven',
+    //);
+    //theme_enable($enable);
+
+    //foreach ($enable as $var => $theme) {
+        //if (!is_numeric($var)) {
+            //variable_set($var, $theme);
+        //}
+    //}
+
+    ////theme_disable(array('bartik'));
+//}
