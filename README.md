@@ -12,7 +12,7 @@ Thanks to the Ubuntu-it team for sharing its work, and for helping in setting up
 
 Note: The deployment has been optimized to work on Ubuntu 12.04 servers
 
-1. Ensure you've root permitions through sudo
+1. Ensure you've root permissions through sudo
 
 2. Run the deployment script (and answer the root question):
 
@@ -40,7 +40,7 @@ Note: The deployment has been optimized to work on Ubuntu 12.04 servers
 
 2. Create content
 
-## Docummentation
+## Documentation
 
 A general wrap-up of the distribution can be review at:
 
