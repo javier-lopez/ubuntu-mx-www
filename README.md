@@ -17,7 +17,7 @@ Note: The deployment has been optimized to work on Ubuntu 12.04 servers
 2. Run the deployment script (and answer the root question):
 
    ```
-   $ sh <(wget -qO- https://raw2.github.com/chilicuil/ubuntu-mx-www/master/deploy)
+   $ sh <(wget -qO- https://raw2.github.com/javier-lopez/ubuntu-mx-www/master/deploy)
    ```
 
 3. Save the generated db settings

@@ -2,8 +2,8 @@
 
 trap _cleanup INT QUIT #trap ctrl-c
 
-site="https://github.com/chilicuil/ubuntu-mx-www"
-updates="https://raw2.github.com/chilicuil/ubuntu-mx-www/master/deploy"
+site="https://github.com/javier-lopez/ubuntu-mx-www"
+updates="https://raw2.github.com/javier-lopez/ubuntu-mx-www/master/deploy"
 web="/var/www"
 gitweb="/srv"
 errorfile="/tmp/deploy.$$.error"
